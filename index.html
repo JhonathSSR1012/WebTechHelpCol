@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechHelpCol | Soluciones TI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f7fc;
+            color: #1a2c3e;
+            line-height: 1.5;
+        }
+        .navbar {
+            background: #0a2b3e;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo h1 { font-size: 1.7rem; }
+        .logo span { color: #2ecc71; }
+        .nav-links { display: flex; gap: 1.8rem; flex-wrap: wrap; }
+        .nav-links a { color: white; text-decoration: none; font-weight: 500; }
+        .nav-links a:hover { color: #2ecc71; }
+        .hero {
+            background: linear-gradient(135deg, #0e3b4b, #0a2b3e);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .hero h2 { font-size: 2.2rem; }
+        .container { max-width: 1300px; margin: 2rem auto; padding: 0 1.5rem; }
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            border-bottom: 3px solid #2ecc71;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+        .title-wrapper { text-align: center; margin-bottom: 2rem; }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.8rem;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border-left: 5px solid #2ecc71;
+        }
+        .card i { font-size: 2.2rem; color: #2ecc71; margin-bottom: 1rem; }
+        .modulos-acceso {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+        .modulo-card {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            text-align: center;
+            width: 280px;
+            text-decoration: none;
+            color: #1a2c3e;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .modulo-card:hover { transform: translateY(-10px); background: #e8f5e9; }
+        .modulo-card i { font-size: 3rem; color: #2ecc71; margin-bottom: 1rem; }
+        footer {
+            background: #0a2b3e;
+            color: #ccc;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+        @media (max-width: 700px) { .navbar { flex-direction: column; gap: 0.8rem; } }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo"><h1>Tech<span>HelpCol</span></h1></div>
+    <div class="nav-links">
+        <a href="#inicio">Inicio</a>
+        <a href="#servicios">Servicios</a>
+        <a href="servicios.html" target="_blank">🛒 Comprar</a>
+        <a href="pagos.html" target="_blank">💳 Pagos QR</a>
+        <a href="#contacto">Contacto</a>
+    </div>
+</nav>
+
+<section class="hero" id="inicio">
+    <h2>Portafolio de Servicios Tecnológicos</h2>
+    <p>Soluciones integrales para la estabilidad, seguridad y crecimiento de su infraestructura IT</p>
+</section>
+
+<div class="container">
+    <div class="title-wrapper" id="servicios"><span class="section-title">Nuestros Servicios</span></div>
+    <div class="cards-grid">
+        <div class="card"><i class="fas fa-desktop"></i><h3>Soporte Técnico</h3><p>Mantenimiento preventivo/correctivo, soporte remoto, instalación Windows/Linux.</p></div>
+        <div class="card"><i class="fas fa-server"></i><h3>Administración Servidores</h3><p>Windows Server, Linux Ubuntu, máxima estabilidad empresarial.</p></div>
+        <div class="card"><i class="fas fa-network-wired"></i><h3>Infraestructura de Red</h3><p>Active Directory, DNS, VPN, GPO, redes empresariales.</p></div>
+        <div class="card"><i class="fas fa-cloud-upload-alt"></i><h3>Servicios en la Nube</h3><p>Office 365, gestión de usuarios, integración cloud.</p></div>
+        <div class="card"><i class="fas fa-code"></i><h3>Desarrollo Web</h3><p>Páginas responsivas, HTML, CSS, JavaScript.</p></div>
+        <div class="card"><i class="fas fa-shield-alt"></i><h3>Seguridad Informática</h3><p>Políticas de seguridad, VPN cifrada, control de accesos.</p></div>
+    </div>
+
+    <div class="title-wrapper"><span class="section-title">Acceso Rápido</span></div>
+    <div class="modulos-acceso">
+        <a href="servicios.html" class="modulo-card" target="_blank">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>Módulo Servicios</h3>
+            <p>Compra, adjunta archivos y genera recibo</p>
+        </a>
+        <a href="pagos.html" class="modulo-card" target="_blank">
+            <i class="fas fa-qrcode"></i>
+            <h3>Módulo Pagos QR</h3>
+            <p>Configura tus códigos QR</p>
+        </a>
+    </div>
+</div>
+
+<footer id="contacto">
+    <p><i class="far fa-envelope"></i> techhelp2026s@gmail.com | <i class="fas fa-phone-alt"></i> 3046101679</p>
+    <p>© 2025 TechHelpCol</p>
+</footer>
+</body>
+</html>
