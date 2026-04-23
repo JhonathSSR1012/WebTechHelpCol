@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechHelpCol - Formulario de Contacto</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #eef2f5 0%, #d4e0e8 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #0a2b3e, #1a4d6b);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header h1 i {
+            color: #2ecc71;
+            margin-right: 10px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .form-container {
+            padding: 40px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0a2b3e;
+            font-size: 14px;
+        }
+        .form-group label i {
+            color: #2ecc71;
+            width: 20px;
+            margin-right: 8px;
+        }
+        .required {
+            color: #e74c3c;
+            margin-left: 5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 3px rgba(46,204,113,0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        .btn-enviar {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-enviar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(46,204,113,0.3);
+        }
+        .btn-enviar:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: flex;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: flex;
+        }
+        .alert i {
+            font-size: 20px;
+        }
+        .info-contacto {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 15px;
+        }
+        .info-item {
+            text-align: center;
+            flex: 1;
+        }
+        .info-item i {
+            font-size: 24px;
+            color: #2ecc71;
+            margin-bottom: 8px;
+        }
+        .info-item h4 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .info-item p {
+            font-size: 14px;
+            color: #0a2b3e;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .row-2, .row-3 {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .form-container {
+                padding: 25px;
+            }
+            .header {
+                padding: 20px;
+            }
+            .info-contacto {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-envelope"></i> Formulario de Contacto</h1>
+        <p>Déjanos tu mensaje y te responderemos a la brevedad posible</p>
+    </div>
+    
+    <div class="form-container">
+        <!-- Alerta de éxito -->
+        <div id="alertSuccess" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span id="successMessage">¡Mensaje enviado correctamente! Te contactaremos pronto.</span>
+        </div>
+        
+        <!-- Alerta de error -->
+        <div id="alertError" class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage">Error al enviar el mensaje. Por favor intenta nuevamente.</span>
+        </div>
+        
+        <form id="contactForm">
+            <!-- Nombre y Apellido -->
+            <div class="row-2">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nombre<span class="required">*</span></label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tag"></i> Apellido<span class="required">*</span></label>
+                    <input type="text" id="apellido" name="apellido" placeholder="Tu apellido" required>
+                </div>
+            </div>
+            
+            <!-- Email y Teléfono -->
+            <div class="row-2">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Correo Electrónico<span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="tucorreo@ejemplo.com" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Teléfono / Celular</label>
+                    <input type="tel" id="telefono" name="telefono" placeholder="+57 300 000 0000">
+                </div>
+            </div>
+            
+            <!-- Asunto -->
+            <div class="form-group">
+                <label><i class="fas fa-tag"></i> Asunto<span class="required">*</span></label>
+                <input type="text" id="asunto" name="asunto" placeholder="¿Sobre qué trata tu mensaje?" required>
+            </div>
+            
+            <!-- Departamento y Ciudad -->
+            <div class="row-2">
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Departamento</label>
+                    <select id="departamento" name="departamento">
+                        <option value="">Selecciona un departamento</option>
+                        <option value="Amazonas">Amazonas</option>
+                        <option value="Antioquia">Antioquia</option>
+                        <option value="Arauca">Arauca</option>
+                        <option value="Atlántico">Atlántico</option>
+                        <option value="Bogotá D.C.">Bogotá D.C.</option>
+                        <option value="Bolívar">Bolívar</option>
+                        <option value="Boyacá">Boyacá</option>
+                        <option value="Caldas">Caldas</option>
+                        <option value="Caquetá">Caquetá</option>
+                        <option value="Casanare">Casanare</option>
+                        <option value="Cauca">Cauca</option>
+                        <option value="Cesar">Cesar</option>
+                        <option value="Chocó">Chocó</option>
+                        <option value="Córdoba">Córdoba</option>
+                        <option value="Cundinamarca">Cundinamarca</option>
+                        <option value="Guainía">Guainía</option>
+                        <option value="Guaviare">Guaviare</option>
+                        <option value="Huila">Huila</option>
+                        <option value="La Guajira">La Guajira</option>
+                        <option value="Magdalena">Magdalena</option>
+                        <option value="Meta">Meta</option>
+                        <option value="Nariño">Nariño</option>
+                        <option value="Norte de Santander">Norte de Santander</option>
+                        <option value="Putumayo">Putumayo</option>
+                        <option value="Quindío">Quindío</option>
+                        <option value="Risaralda">Risaralda</option>
+                        <option value="San Andrés y Providencia">San Andrés y Providencia</option>
+                        <option value="Santander">Santander</option>
+                        <option value="Sucre">Sucre</option>
+                        <option value="Tolima">Tolima</option>
+                        <option value="Valle del Cauca">Valle del Cauca</option>
+                        <option value="Vaupés">Vaupés</option>
+                        <option value="Vichada">Vichada</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-city"></i> Ciudad</label>
+                    <input type="text" id="ciudad" name="ciudad" placeholder="Tu ciudad">
+                </div>
+            </div>
+            
+            <!-- Descripción / Mensaje -->
+            <div class="form-group">
+                <label><i class="fas fa-comment-dots"></i> Descripción / Mensaje<span class="required">*</span></label>
+                <textarea id="mensaje" name="mensaje" placeholder="Escribe tu mensaje aquí..."></textarea>
+            </div>
+            
+            <!-- Tipo de consulta -->
+            <div class="form-group">
+                <label><i class="fas fa-question-circle"></i> Tipo de Consulta</label>
+                <select id="tipoConsulta" name="tipoConsulta">
+                    <option value="general">Consulta General</option>
+                    <option value="soporte">Soporte Técnico</option>
+                    <option value="ventas">Ventas / Cotización</option>
+                    <option value="proyecto">Información de Proyecto</option>
+                    <option value="reclamo">Reclamo o Sugerencia</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            
+            <!-- Cómo nos conociste -->
+            <div class="form-group">
+                <label><i class="fas fa-globe"></i> ¿Cómo nos conociste?</label>
+                <select id="conoce" name="conoce">
+                    <option value="">Selecciona una opción</option>
+                    <option value="google">Búsqueda en Google</option>
+                    <option value="redes_sociales">Redes Sociales</option>
+                    <option value="recomendacion">Recomendación</option>
+                    <option value="anuncio">Anuncio Publicitario</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            
+            <!-- Botón de envío -->
+            <button type="submit" class="btn-enviar" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Enviar Mensaje
+            </button>
+        </form>
+        
+        <!-- Información de contacto adicional -->
+        <div class="info-contacto">
+            <div class="info-item">
+                <i class="fas fa-envelope"></i>
+                <h4>Email</h4>
+                <p>techhelp2026s@gmail.com</p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-phone-alt"></i>
+                <h4>Teléfono</h4>
+                <p>3046101679</p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-clock"></i>
+                <h4>Horario de atención</h4>
+                <p>Lun - Vie: 8:00 - 18:00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== CONFIGURACIÓN DE EMAILJS ====================
+    // REGISTRATE EN https://www.emailjs.com/ y obtén tus credenciales
+    // 1. Crea una cuenta en EmailJS
+    // 2. Ve a "Email Services" y crea un servicio (Gmail, Outlook, etc.)
+    // 3. Ve a "Email Templates" y crea una plantilla con las variables
+    // 4. Reemplaza los valores abajo con tus credenciales
+    
+    const EMAILJS_PUBLIC_KEY = '9xdZ-NnOdVhGJIcnN';      
+    const EMAILJS_SERVICE_ID = 'service_jg2xr4v';      
+    const EMAILJS_TEMPLATE_ID = 'template_i4d981x';    
+    
+    // Inicializar EmailJS
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    
+    // Elementos del DOM
+    const form = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertError = document.getElementById('alertError');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    
+    // Ocultar alertas inicialmente
+    alertSuccess.style.display = 'none';
+    alertError.style.display = 'none';
+    
+    // Función para mostrar alerta
+    function mostrarAlerta(tipo, mensaje) {
+        if (tipo === 'success') {
+            successMessage.textContent = mensaje;
+            alertSuccess.style.display = 'flex';
+            alertError.style.display = 'none';
+        } else {
+            errorMessage.textContent = mensaje;
+            alertError.style.display = 'flex';
+            alertSuccess.style.display = 'none';
+        }
+        
+        // Ocultar alerta después de 5 segundos
+        setTimeout(() => {
+            alertSuccess.style.display = 'none';
+            alertError.style.display = 'none';
+        }, 5000);
+    }
+    
+    // Función para limpiar el formulario
+    function limpiarFormulario() {
+        document.getElementById('nombre').value = '';
+        document.getElementById('apellido').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('telefono').value = '';
+        document.getElementById('asunto').value = '';
+        document.getElementById('departamento').value = '';
+        document.getElementById('ciudad').value = '';
+        document.getElementById('mensaje').value = '';
+        document.getElementById('tipoConsulta').value = 'general';
+        document.getElementById('conoce').value = '';
+    }
+    
+    // Función para validar el formulario
+    function validarFormulario() {
+        const nombre = document.getElementById('nombre').value.trim();
+        const apellido = document.getElementById('apellido').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const asunto = document.getElementById('asunto').value.trim();
+        const mensaje = document.getElementById('mensaje').value.trim();
+        
+        if (!nombre) {
+            mostrarAlerta('error', 'Por favor ingresa tu nombre');
+            document.getElementById('nombre').focus();
+            return false;
+        }
+        
+        if (!apellido) {
+            mostrarAlerta('error', 'Por favor ingresa tu apellido');
+            document.getElementById('apellido').focus();
+            return false;
+        }
+        
+        if (!email) {
+            mostrarAlerta('error', 'Por favor ingresa tu correo electrónico');
+            document.getElementById('email').focus();
+            return false;
+        }
+        
+        // Validar formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            mostrarAlerta('error', 'Por favor ingresa un correo electrónico válido');
+            document.getElementById('email').focus();
+            return false;
+        }
+        
+        if (!asunto) {
+            mostrarAlerta('error', 'Por favor ingresa el asunto del mensaje');
+            document.getElementById('asunto').focus();
+            return false;
+        }
+        
+        if (!mensaje) {
+            mostrarAlerta('error', 'Por favor escribe tu mensaje');
+            document.getElementById('mensaje').focus();
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Función para enviar el correo
+    async function enviarCorreo(e) {
+        e.preventDefault();
+        
+        // Validar formulario
+        if (!validarFormulario()) {
+            return;
+        }
+        
+        // Deshabilitar botón mientras se envía
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando mensaje...';
+        
+        // Obtener datos del formulario
+        const nombre = document.getElementById('nombre').value.trim();
+        const apellido = document.getElementById('apellido').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const telefono = document.getElementById('telefono').value.trim();
+        const asunto = document.getElementById('asunto').value.trim();
+        const departamento = document.getElementById('departamento').value;
+        const ciudad = document.getElementById('ciudad').value.trim();
+        const mensaje = document.getElementById('mensaje').value.trim();
+        const tipoConsulta = document.getElementById('tipoConsulta').value;
+        const conoce = document.getElementById('conoce').value;
+        
+        // Nombre completo
+        const nombreCompleto = `${nombre} ${apellido}`;
+        
+        // Preparar parámetros para EmailJS
+        const templateParams = {
+            // Para el administrador
+            to_email: 'techhelp2026s@gmail.com',
+            from_name: nombreCompleto,
+            from_email: email,
+            telefono: telefono || 'No especificado',
+            asunto: asunto,
+            departamento: departamento || 'No especificado',
+            ciudad: ciudad || 'No especificado',
+            mensaje: mensaje,
+            tipo_consulta: tipoConsulta,
+            como_conocio: conoce || 'No especificado',
+            fecha: new Date().toLocaleString('es-CO'),
+            
+            // Para el cliente (correo de confirmación)
+            cliente_email: email,
+            cliente_nombre: nombreCompleto
+        };
+        
+        try {
+            // Enviar correo al administrador
+            const response = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+            console.log('Correo enviado exitosamente:', response);
+            
+            mostrarAlerta('success', `¡Gracias ${nombre}! Tu mensaje ha sido enviado correctamente. Te contactaremos pronto.`);
+            
+            // Limpiar formulario después de enviar
+            limpiarFormulario();
+            
+        } catch (error) {
+            console.error('Error al enviar correo:', error);
+            mostrarAlerta('error', 'Hubo un error al enviar tu mensaje. Por favor intenta nuevamente o contáctanos directamente al correo techhelp2026s@gmail.com');
+        } finally {
+            // Habilitar botón nuevamente
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensaje';
+        }
+    }
+    
+    // Event listener para el formulario
+    form.addEventListener('submit', enviarCorreo);
+    
+    // Validación en tiempo real para el campo email
+    document.getElementById('email').addEventListener('input', function() {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (this.value && !emailRegex.test(this.value)) {
+            this.style.borderColor = '#e74c3c';
+        } else {
+            this.style.borderColor = '#e0e0e0';
+        }
+    });
+    
+    // Efecto de validación en tiempo real para campos requeridos
+    const camposRequeridos = ['nombre', 'apellido', 'asunto', 'mensaje'];
+    camposRequeridos.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+            campo.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.style.borderColor = '#e0e0e0';
+                } else {
+                    this.style.borderColor = '#e74c3c';
+                }
+            });
+        }
+    });
+    
+    // Mensaje de bienvenida en consola
+    console.log('📧 Formulario de contacto cargado correctamente');
+    console.log('🔧 Configura tus credenciales de EmailJS para enviar correos reales');
+    console.log('📝 Registrate en https://www.emailjs.com/');
+</script>
+</body>
+</html>
