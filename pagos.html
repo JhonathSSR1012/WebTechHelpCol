@@ -312,16 +312,15 @@
         }
     ];
     
-    // Variables para almacenar información del pago
     let pagoInfo = {
         metodo: null,
         monto: null,
         referencia: null,
         servicio: null,
-        returnUrl: null
+        returnUrl: null,
+        clienteEmail: null
     };
     
-    // Función para verificar si una imagen existe
     function verificarImagen(url, callback) {
         const img = new Image();
         img.onload = () => callback(true);
@@ -329,7 +328,6 @@
         img.src = url;
     }
     
-    // Función para cargar imágenes predeterminadas en el selector
     function cargarOpcionesImagenes(containerId, imagenes, tipo, onSelectCallback) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -363,7 +361,7 @@
         });
     }
     
-    // ========== MANEJAR QR NEQUI ==========
+    // Nequi
     const imgNequi = document.getElementById('imgNequi');
     const placeholderNequi = document.getElementById('placeholderNequi');
     const qrGrandeNequi = document.getElementById('qrGrandeNequi');
@@ -385,7 +383,7 @@
         guardarQRNequi(url, nombre);
     });
     
-    // ========== MANEJAR QR DAVIVIENDA ==========
+    // Davivienda
     const imgDavivienda = document.getElementById('imgDavivienda');
     const placeholderDavivienda = document.getElementById('placeholderDavivienda');
     const qrGrandeDavivienda = document.getElementById('qrGrandeDavivienda');
@@ -407,7 +405,7 @@
         guardarQRDavivienda(url, nombre);
     });
     
-    // ========== CARGAR QR GUARDADOS PREVIAMENTE ==========
+    // Cargar QR guardados
     const qrNequiGuardado = localStorage.getItem('qrNequi');
     if (qrNequiGuardado && qrNequiGuardado !== 'undefined') {
         imgNequi.src = qrNequiGuardado;
@@ -422,13 +420,14 @@
         placeholderDavivienda.style.display = 'none';
     }
     
-    // ========== PROCESAR PARÁMETROS DE URL PARA PAGO ==========
+    // Procesar parámetros de URL
     const urlParams = new URLSearchParams(window.location.search);
     const show = urlParams.get('show');
     const monto = urlParams.get('monto');
     const referencia = urlParams.get('ref');
     const servicio = urlParams.get('servicio');
     const returnUrl = urlParams.get('return');
+    const clienteEmail = urlParams.get('email');
     
     if (show) {
         pagoInfo = {
@@ -436,7 +435,8 @@
             monto: monto,
             referencia: referencia,
             servicio: servicio,
-            returnUrl: returnUrl || 'servicios.html'
+            returnUrl: returnUrl || 'servicios.html',
+            clienteEmail: clienteEmail
         };
         
         const modal = document.getElementById('pagoModal');
@@ -447,11 +447,11 @@
         
         if (show === 'nequi') {
             const qr = localStorage.getItem('qrNequi');
-            const qrNombre = localStorage.getItem('qrNequiNombre') || 'QR Nequi';
             pagoInfoDiv.innerHTML = `
                 <p><strong>💰 Monto a pagar:</strong> $${parseInt(monto).toLocaleString('es-CO')} COP</p>
                 <p><strong>🔑 Referencia:</strong> ${referencia}</p>
                 <p><strong>🛒 Servicio:</strong> ${decodeURIComponent(servicio || 'No especificado')}</p>
+                <p><strong>📧 Enviar a:</strong> ${decodeURIComponent(clienteEmail || 'No especificado')}</p>
                 <p><strong>📱 Cuenta Nequi:</strong> 3046101679</p>
             `;
             qrDisplay.innerHTML = qr && qr !== 'undefined' ? 
@@ -459,11 +459,11 @@
                 '<p style="color:red;">⚠️ No hay QR configurado. Selecciona un QR arriba.</p>';
         } else if (show === 'davivienda') {
             const qr = localStorage.getItem('qrDavivienda');
-            const qrNombre = localStorage.getItem('qrDaviviendaNombre') || 'QR Davivienda';
             pagoInfoDiv.innerHTML = `
                 <p><strong>💰 Monto a pagar:</strong> $${parseInt(monto).toLocaleString('es-CO')} COP</p>
                 <p><strong>🔑 Referencia:</strong> ${referencia}</p>
                 <p><strong>🛒 Servicio:</strong> ${decodeURIComponent(servicio || 'No especificado')}</p>
+                <p><strong>📧 Enviar a:</strong> ${decodeURIComponent(clienteEmail || 'No especificado')}</p>
                 <p><strong>🏦 Cuenta Davivienda:</strong> 9876543210</p>
             `;
             qrDisplay.innerHTML = qr && qr !== 'undefined' ? 
@@ -476,53 +476,43 @@
         }, 100);
     }
     
-    // ========== CONFIRMAR PAGO ==========
+    // Confirmar pago
     function confirmarPago() {
         if (!pagoInfo.monto) {
             alert("No hay información de pago pendiente");
             return;
         }
         
-        // Enviar mensaje a la ventana padre (servicios.html)
         if (window.opener && !window.opener.closed) {
             window.opener.postMessage({
                 type: 'PAGO_CONFIRMADO',
                 metodo: pagoInfo.metodo,
                 referencia: pagoInfo.referencia,
                 monto: pagoInfo.monto,
-                servicio: pagoInfo.servicio
+                servicio: pagoInfo.servicio,
+                clienteEmail: pagoInfo.clienteEmail
             }, '*');
             
-            alert(`✅ Pago confirmado exitosamente!\n\nMétodo: ${pagoInfo.metodo}\nReferencia: ${pagoInfo.referencia}\nMonto: $${parseInt(pagoInfo.monto).toLocaleString('es-CO')} COP\n\nCerrando esta ventana...`);
+            alert(`✅ Pago confirmado exitosamente!\n\nMétodo: ${pagoInfo.metodo}\nReferencia: ${pagoInfo.referencia}\nMonto: $${parseInt(pagoInfo.monto).toLocaleString('es-CO')} COP\n\nEl programa será enviado a: ${decodeURIComponent(pagoInfo.clienteEmail || 'tu correo')}\n\nCerrando esta ventana...`);
             
-            // Cerrar la ventana después de 1 segundo
             setTimeout(() => {
                 window.close();
             }, 1000);
         } else {
-            // Si no hay ventana padre, redirigir
             alert(`✅ Pago confirmado!\n\nMétodo: ${pagoInfo.metodo}\nReferencia: ${pagoInfo.referencia}\nMonto: $${parseInt(pagoInfo.monto).toLocaleString('es-CO')} COP\n\nRedirigiendo...`);
             window.location.href = pagoInfo.returnUrl || 'servicios.html';
         }
     }
     
-    // Cerrar modal
-    const confirmarBtn = document.getElementById('confirmarPagoBtn');
-    if (confirmarBtn) {
-        confirmarBtn.addEventListener('click', confirmarPago);
-    }
-    
-    const cerrarModalBtn = document.getElementById('cerrarModal');
-    if (cerrarModalBtn) {
-        cerrarModalBtn.addEventListener('click', () => {
-            document.getElementById('pagoModal').classList.remove('visible');
-            if (window.opener && !window.opener.closed) {
-                window.close();
-            } else {
-                window.location.href = 'servicios.html';
-            }
-        });
-    }
+    document.getElementById('confirmarPagoBtn').addEventListener('click', confirmarPago);
+    document.getElementById('cerrarModal').addEventListener('click', () => {
+        document.getElementById('pagoModal').classList.remove('visible');
+        if (window.opener && !window.opener.closed) {
+            window.close();
+        } else {
+            window.location.href = 'servicios.html';
+        }
+    });
     
     console.log('📁 Rutas configuradas:');
     console.log('Nequi QR:', imagenesNequiPredeterminadas[0]?.url);

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechHelpCol - Servicios</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -108,49 +110,35 @@
             border-color: #2ecc71;
         }
         
-        .download-section {
-            background: #f8f9fa;
+        /* Sección de correo del cliente */
+        .email-section {
+            background: linear-gradient(135deg, #e8f8f0, #d4edda);
             border-radius: 20px;
             padding: 25px;
             margin: 20px 0;
-            border: 2px solid #dee2e6;
+            border: 2px solid #2ecc71;
             text-align: center;
         }
-        .download-title {
+        .email-title {
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 15px;
             color: #0a2b3e;
         }
-        .download-title i { color: #2ecc71; margin-right: 10px; }
-        
-        .btn-drive {
-            background: linear-gradient(135deg, #0a2b3e, #1a4d6b);
-            color: white;
-            border: none;
-            padding: 14px 30px;
+        .email-title i { color: #2ecc71; margin-right: 10px; }
+        .email-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
             border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s;
             font-size: 16px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+            margin: 10px auto;
+            display: block;
         }
-        .btn-drive:hover {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            transform: scale(1.02);
-        }
-        .btn-drive.disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .btn-drive.disabled:hover {
-            transform: none;
-            background: #95a5a6;
+        .email-input:focus {
+            outline: none;
+            border-color: #2ecc71;
         }
         
         .payment-buttons {
@@ -169,6 +157,11 @@
             transition: transform 0.2s;
         }
         .btn-pago:hover { transform: scale(1.05); }
+        .btn-pago:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
         .btn-nequi { background: #7a2be0; color: white; }
         .btn-davivienda { background: #e31e24; color: white; }
         
@@ -242,13 +235,19 @@
             cursor: pointer;
         }
         
-        .pago-confirmacion {
-            background: #e8f8f0;
-            border-radius: 15px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: center;
-            border: 1px solid #2ecc71;
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
@@ -261,7 +260,7 @@
 <body>
 <div class="container">
     <h1><i class="fas fa-cogs"></i> Módulo de Servicios</h1>
-    <div class="sub">Selecciona un proyecto, realiza el pago y obtén tu enlace de descarga</div>
+    <div class="sub">Selecciona un proyecto, realiza el pago y recibe el programa en tu correo</div>
 
     <!-- Lista de proyectos -->
     <div class="product-list" id="productList"></div>
@@ -274,21 +273,14 @@
         <div id="galleryContainer" class="gallery"></div>
     </div>
 
-    <!-- Sección de Descarga (habilitada solo después del pago) -->
-    <div class="download-section" id="downloadSection">
-        <div class="download-title">
-            <i class="fab fa-google-drive"></i> Descarga del Proyecto
+    <!-- Sección de correo del cliente -->
+    <div class="email-section" id="emailSection">
+        <div class="email-title">
+            <i class="fas fa-envelope"></i> Correo para enviar el programa
         </div>
-        <div id="driveLinkContainer">
-            <button class="btn-drive disabled" id="btnDrive" disabled>
-                <i class="fab fa-google-drive"></i> Realiza el pago para descargar
-            </button>
-        </div>
-        <div id="pagoConfirmacion" class="pago-confirmacion" style="display: none;">
-            <i class="fas fa-check-circle" style="color:#2ecc71; font-size:24px;"></i>
-            <p><strong>¡Pago confirmado!</strong> El enlace de descarga está habilitado.</p>
-        </div>
-        <div id="downloadAlert" class="alert"></div>
+        <p style="margin-bottom: 15px; color: #666;">Después del pago, recibirás el programa en este correo electrónico</p>
+        <input type="email" id="clienteEmail" class="email-input" placeholder="ejemplo@correo.com" required>
+        <div id="emailAlert" class="alert"></div>
     </div>
 
     <!-- Botones de pago -->
@@ -320,6 +312,21 @@
 </div>
 
 <script>
+    // ==================== CONFIGURACIÓN DE EMAILJS ====================
+    // INSTRUCCIONES: Regístrate en https://www.emailjs.com/
+    // 1. Crea una cuenta gratis
+    // 2. Ve a "Email Services" y crea un servicio (Gmail, Outlook, etc.)
+    // 3. Ve a "Email Templates" y crea una plantilla con las variables:
+    //    {{cliente_nombre}}, {{cliente_email}}, {{proyecto_nombre}}, {{monto}}, {{referencia}}, {{fecha}}
+    // 4. Reemplaza los valores abajo con tus credenciales
+    
+    const EMAILJS_PUBLIC_KEY = 'TU_PUBLIC_KEY';      // Reemplazar con tu Public Key
+    const EMAILJS_SERVICE_ID = 'TU_SERVICE_ID';      // Reemplazar con tu Service ID
+    const EMAILJS_TEMPLATE_ID = 'TU_TEMPLATE_ID';    // Reemplazar con tu Template ID
+    
+    // Inicializar EmailJS
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    
     // ==================== CONFIGURACIÓN DE PROYECTOS ====================
     const proyectos = [
         { 
@@ -327,24 +334,21 @@
             nombre: "🏗️ StarMarket_System - APP Supermercado", 
             descripcion: "Implementación de inventarios, pagos",
             precio: 400000,
-            carpeta: "StarMarket_System",
-            driveUrl: "https://drive.google.com/drive/folders/1CaRkJuMugECOc7OivRXlFPGqU-xEVzN7?usp=drive_link"
+            carpeta: "StarMarket_System"
         },
         { 
             id: 2, 
             nombre: "🏭 LectorFactXML - Lector de facturación XML", 
             descripcion: "Lector de facturación DIAN, convertidor de XML",
             precio: 300000,
-            carpeta: "LectorFactXML",
-            driveUrl: "https://drive.google.com/drive/folders/1j8DJH4jDPPrDZg757H5zxrIjXaK3FjFK?usp=drive_link"
+            carpeta: "LectorFactXML"
         },
         { 
             id: 3, 
             nombre: "🔐 QRVentas - Sistema QR de Ventas", 
             descripcion: "Implementación de un sistema QR de ventas para tiendas, abarrotes, supermercados",
             precio: 440000,
-            carpeta: "QRVentas",
-            driveUrl: "https://drive.google.com/drive/folders/11aIi_j0yyDSBxZz1trHT0OQOD01JVm2F?usp=drive_link"
+            carpeta: "QRVentas"
         }
     ];
     
@@ -414,54 +418,105 @@
         }, 1000);
     }
     
-    // Función para habilitar el enlace de Google Drive después del pago
-    function habilitarDescargaDrive() {
-        if (!proyectoSeleccionado) return;
+    // Función para enviar correo al cliente y al administrador
+    async function enviarCorreos(clienteEmail, proyecto, monto, referencia, metodo) {
+        const fecha = new Date().toLocaleString('es-CO');
+        const nombreProyecto = proyecto.nombre.replace('🏗️ ', '').replace('🏭 ', '').replace('🔐 ', '');
         
-        const btnDrive = document.getElementById('btnDrive');
-        const pagoConfirmacionDiv = document.getElementById('pagoConfirmacion');
+        // 1. Enviar correo al CLIENTE (con el programa/instrucciones)
+        const clienteTemplateParams = {
+            to_email: clienteEmail,
+            cliente_email: clienteEmail,
+            proyecto_nombre: nombreProyecto,
+            monto: `$${monto.toLocaleString('es-CO')} COP`,
+            referencia: referencia,
+            fecha: fecha,
+            metodo: metodo
+        };
         
-        if (pagoConfirmado) {
-            btnDrive.innerHTML = `<i class="fab fa-google-drive"></i> Descargar ${proyectoSeleccionado.nombre}`;
-            btnDrive.className = 'btn-drive';
-            btnDrive.disabled = false;
-            btnDrive.onclick = () => {
-                window.open(proyectoSeleccionado.driveUrl, '_blank');
-                mostrarAlerta('downloadAlert', '✅ Redirigiendo a Google Drive para descargar el proyecto', 'success');
-            };
-            pagoConfirmacionDiv.style.display = 'block';
-        } else {
-            btnDrive.innerHTML = `<i class="fab fa-google-drive"></i> Realiza el pago para descargar`;
-            btnDrive.className = 'btn-drive disabled';
-            btnDrive.disabled = true;
-            btnDrive.onclick = null;
-            pagoConfirmacionDiv.style.display = 'none';
+        // 2. Enviar correo al ADMINISTRADOR (notificación de venta)
+        const adminTemplateParams = {
+            to_email: 'techhelp2026s@gmail.com',
+            cliente_email: clienteEmail,
+            proyecto_nombre: nombreProyecto,
+            monto: `$${monto.toLocaleString('es-CO')} COP`,
+            referencia: referencia,
+            fecha: fecha,
+            metodo: metodo
+        };
+        
+        try {
+            // Enviar correo al cliente
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, clienteTemplateParams);
+            console.log('Correo enviado al cliente');
+            
+            // Enviar correo al administrador
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, adminTemplateParams);
+            console.log('Correo enviado al administrador');
+            
+            return true;
+        } catch (error) {
+            console.error('Error enviando correo:', error);
+            return false;
         }
     }
     
     // Función para confirmar pago (llamada desde la ventana de pagos)
-    function confirmarPagoDesdeVentana(metodo, referencia, monto) {
-        pagoConfirmado = true;
-        pagoRealizado = true;
+    async function confirmarPagoDesdeVentana(metodo, referencia, monto, clienteEmail) {
+        if (!proyectoSeleccionado) return;
         
-        habilitarDescargaDrive();
-        mostrarAlerta('downloadAlert', `✅ Pago confirmado por ${metodo}. ¡Ya puedes descargar el proyecto!`, 'success');
+        // Mostrar loading en los botones
+        const btns = document.querySelectorAll('.btn-pago');
+        btns.forEach(btn => btn.disabled = true);
         
-        const recibo = generarRecibo(metodo, referencia);
-        mostrarRecibo(recibo);
-        
-        // Limpiar pendingPayment
-        pendingPayment = null;
+        try {
+            // Enviar correos
+            const emailEnviado = await enviarCorreos(clienteEmail, proyectoSeleccionado, monto, referencia, metodo);
+            
+            if (emailEnviado) {
+                pagoConfirmado = true;
+                pagoRealizado = true;
+                
+                mostrarAlerta('emailAlert', `✅ ¡Pago confirmado! Se ha enviado el programa a ${clienteEmail} y una notificación al administrador.`, 'success');
+                
+                // Generar y mostrar recibo
+                const recibo = generarRecibo(metodo, referencia, clienteEmail);
+                mostrarRecibo(recibo);
+            } else {
+                mostrarAlerta('emailAlert', '⚠️ Pago confirmado pero hubo un error enviando el correo. Contacta a soporte.', 'error');
+            }
+        } catch (error) {
+            mostrarAlerta('emailAlert', '❌ Error al procesar el pago. Contacta a soporte.', 'error');
+        } finally {
+            btns.forEach(btn => btn.disabled = false);
+            pendingPayment = null;
+        }
     }
     
     // Escuchar mensajes desde la ventana de pagos
-    window.addEventListener('message', function(event) {
+    window.addEventListener('message', async function(event) {
         if (event.data && event.data.type === 'PAGO_CONFIRMADO') {
-            console.log('Pago confirmado recibido:', event.data);
-            confirmarPagoDesdeVentana(event.data.metodo, event.data.referencia, event.data.monto);
+            const clienteEmail = document.getElementById('clienteEmail').value.trim();
+            
+            if (!clienteEmail) {
+                alert("⚠️ Por favor, ingresa tu correo electrónico antes de confirmar el pago");
+                return;
+            }
+            
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clienteEmail)) {
+                alert("⚠️ Por favor, ingresa un correo electrónico válido");
+                return;
+            }
+            
+            await confirmarPagoDesdeVentana(
+                event.data.metodo, 
+                event.data.referencia, 
+                parseInt(event.data.monto), 
+                clienteEmail
+            );
             
             // Mostrar mensaje adicional
-            alert(`✅ ¡Pago confirmado!\n\nMétodo: ${event.data.metodo}\nReferencia: ${event.data.referencia}\nMonto: $${parseInt(event.data.monto).toLocaleString('es-CO')} COP\n\nEl enlace de descarga ya está disponible.`);
+            alert(`✅ ¡Pago confirmado!\n\nMétodo: ${event.data.metodo}\nReferencia: ${event.data.referencia}\nMonto: $${parseInt(event.data.monto).toLocaleString('es-CO')} COP\n\nEl programa ha sido enviado a tu correo: ${clienteEmail}\n\nRevisa tu bandeja de entrada o spam.`);
         }
     });
     
@@ -486,7 +541,7 @@
         alert.className = `alert alert-${tipo}`;
         setTimeout(() => {
             alert.className = 'alert';
-        }, 5000);
+        }, 8000);
     }
     
     // ========== RENDERIZAR PROYECTOS ==========
@@ -503,7 +558,7 @@
                 <div class="product-price">$${proy.precio.toLocaleString('es-CO')} COP</div>
                 <div style="font-size:13px; color:#666; margin:10px 0;">${proy.descripcion}</div>
                 <div class="product-status">
-                    <span class="status-badge badge-info">💾 Entrega por Drive</span>
+                    <span class="status-badge badge-info">📧 Envío por correo</span>
                 </div>
                 ${proyectoSeleccionado?.id === proy.id ? '<i class="fas fa-check-circle" style="color:#2ecc71; margin-top:10px; font-size:20px;"></i>' : ''}
             `;
@@ -511,8 +566,6 @@
                 if (proyectoSeleccionado?.id !== proy.id) {
                     pagoConfirmado = false;
                     pagoRealizado = false;
-                    habilitarDescargaDrive();
-                    // Ocultar recibo al cambiar de proyecto
                     document.getElementById('recibo').classList.remove('visible');
                 }
                 proyectoSeleccionado = proy;
@@ -524,7 +577,7 @@
     }
     
     // ========== GENERAR RECIBO ==========
-    function generarRecibo(metodoPago, referencia) {
+    function generarRecibo(metodoPago, referencia, clienteEmail) {
         if (!proyectoSeleccionado) return null;
         
         return {
@@ -535,7 +588,7 @@
             monto: proyectoSeleccionado.precio,
             metodo: metodoPago,
             referencia: referencia,
-            linkDescarga: proyectoSeleccionado.driveUrl,
+            clienteEmail: clienteEmail,
             cliente: "Cliente Web - TechHelpCol"
         };
     }
@@ -550,9 +603,10 @@
             <p><strong>💰 Monto:</strong> $${recibo.monto.toLocaleString('es-CO')} COP</p>
             <p><strong>💳 Método de pago:</strong> ${recibo.metodo}</p>
             <p><strong>🔑 Referencia:</strong> ${recibo.referencia}</p>
-            <p><strong>📦 Link de descarga:</strong> <a href="${recibo.linkDescarga}" target="_blank">Haz clic aquí para descargar</a></p>
+            <p><strong>📧 Enviado a:</strong> ${recibo.clienteEmail}</p>
             <hr>
             <p><i class="fas fa-check-circle" style="color:#2ecc71; font-size:20px;"></i> <strong>¡Pago registrado exitosamente!</strong></p>
+            <p><i class="fas fa-envelope"></i> <strong>El programa ha sido enviado a tu correo electrónico</strong></p>
             <p style="margin-top:15px; font-size:12px; color:#666;">📧 Soporte: techhelp2026s@gmail.com | 📱 Celular: 3046101679</p>
             <p style="font-size:11px; color:#999;">TechHelpCol - Soluciones Tecnológicas Integrales</p>
         `;
@@ -571,7 +625,21 @@
         }
         
         if (pagoRealizado) {
-            alert("⚠️ Ya has realizado el pago para este proyecto. Puedes descargarlo desde el botón de Drive.");
+            alert("⚠️ Ya has realizado el pago para este proyecto. Revisa tu correo.");
+            return;
+        }
+        
+        const clienteEmail = document.getElementById('clienteEmail').value.trim();
+        
+        if (!clienteEmail) {
+            alert("⚠️ Por favor, ingresa tu correo electrónico para recibir el programa");
+            document.getElementById('clienteEmail').focus();
+            return;
+        }
+        
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clienteEmail)) {
+            alert("⚠️ Por favor, ingresa un correo electrónico válido");
+            document.getElementById('clienteEmail').focus();
             return;
         }
         
@@ -585,11 +653,15 @@
             referencia: referencia,
             metodo: metodoNombre,
             monto: monto,
-            proyecto: proyectoSeleccionado.id
+            proyecto: proyectoSeleccionado.id,
+            clienteEmail: clienteEmail
         };
         
+        // Guardar email en localStorage para persistencia
+        localStorage.setItem('clienteEmail', clienteEmail);
+        
         // Redirigir a la página de pagos con los parámetros
-        const urlPago = `pagos.html?show=${metodo === 'NEQUI' ? 'nequi' : 'davivienda'}&monto=${monto}&ref=${referencia}&servicio=${encodeURIComponent(servicio)}&return=servicios.html`;
+        const urlPago = `pagos.html?show=${metodo === 'NEQUI' ? 'nequi' : 'davivienda'}&monto=${monto}&ref=${referencia}&servicio=${encodeURIComponent(servicio)}&return=servicios.html&email=${encodeURIComponent(clienteEmail)}`;
         
         // Abrir ventana de pago
         const ventanaPago = window.open(urlPago, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
@@ -625,13 +697,18 @@
         ventana.document.close();
     };
     
+    // Cargar email guardado
+    const emailGuardado = localStorage.getItem('clienteEmail');
+    if (emailGuardado) {
+        document.getElementById('clienteEmail').value = emailGuardado;
+    }
+    
     // ========== INICIALIZAR ==========
     renderizarProyectos();
     if (proyectos.length > 0) {
         proyectoSeleccionado = proyectos[0];
         renderizarProyectos();
         cargarImagenesProyecto(proyectoSeleccionado.id);
-        habilitarDescargaDrive();
     }
 </script>
 </body>
