@@ -137,38 +137,41 @@
             border: 1px solid #2ecc71;
         }
         
-        .btn-cerrar {
+        .btn-confirmar {
             background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 50px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .btn-confirmar:hover {
+            background: #27ae60;
+            transform: scale(1.02);
+        }
+        
+        .btn-cerrar {
+            background: #95a5a6;
             color: white;
             border: none;
             padding: 12px 30px;
             border-radius: 50px;
-            margin-top: 30px;
+            margin-top: 15px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 16px;
             display: block;
             margin-left: auto;
             margin-right: auto;
         }
         .btn-cerrar:hover {
-            background: #27ae60;
-            transform: scale(1.02);
-        }
-        
-        .btn-volver {
-            display: inline-block;
-            background: #2ecc71;
-            color: white;
-            text-decoration: none;
-            padding: 12px 30px;
-            border-radius: 50px;
-            margin-top: 30px;
-            transition: all 0.3s;
-        }
-        .btn-volver:hover {
-            background: #27ae60;
-            transform: scale(1.02);
+            background: #7f8c8d;
         }
         
         .footer { text-align: center; margin-top: 30px; }
@@ -243,7 +246,7 @@
             </div>
             
             <div class="info-cuenta">
-                <i class="fas fa-building"></i> <strong>Cuenta Davivienda:</strong> 9876543210<br>
+                <i class="fas fa-building"></i> <strong>Cuenta Davivienda:</strong> <br>
                 <small>Número de cuenta para transferencias</small>
             </div>
         </div>
@@ -253,8 +256,11 @@
     <div id="infoPago" class="info-pago"></div>
 
     <div class="footer">
+        <button class="btn-confirmar" id="confirmarPagoBtn">
+            <i class="fas fa-check-circle"></i> Confirmar Pago
+        </button>
         <button class="btn-cerrar" id="cerrarVentanaBtn">
-            <i class="fas fa-times"></i> Cerrar ventana
+            <i class="fas fa-times"></i> Cancelar
         </button>
     </div>
 </div>
@@ -276,6 +282,13 @@
             descripcion: "Código QR para pagos con Davivienda"
         }
     ];
+    
+    let pagoInfo = {
+        metodo: null,
+        monto: null,
+        referencia: null,
+        servicio: null
+    };
     
     function verificarImagen(url, callback) {
         const img = new Image();
@@ -363,53 +376,84 @@
         placeholderDavivienda.style.display = 'none';
     }
     
-    // Procesar parámetros de URL para mostrar información del pago
+    // Procesar parámetros de URL
     const urlParams = new URLSearchParams(window.location.search);
     const show = urlParams.get('show');
     const monto = urlParams.get('monto');
     const servicio = urlParams.get('servicio');
-    const clienteEmail = urlParams.get('email');
     
     if (show) {
         const infoPago = document.getElementById('infoPago');
+        const referencia = `PAGO-${Date.now()}-${Math.floor(Math.random()*10000)}`;
+        
+        pagoInfo = {
+            metodo: show === 'nequi' ? 'Nequi' : 'Davivienda',
+            monto: monto,
+            referencia: referencia,
+            servicio: servicio
+        };
         
         if (show === 'nequi') {
             infoPago.innerHTML = `
                 <p><strong>💰 Monto a pagar:</strong> $${parseInt(monto).toLocaleString('es-CO')} COP</p>
                 <p><strong>🛒 Servicio:</strong> ${decodeURIComponent(servicio || 'No especificado')}</p>
-                <p><strong>📧 El programa se enviará a:</strong> ${decodeURIComponent(clienteEmail || 'No especificado')}</p>
                 <p><strong>📱 Cuenta Nequi:</strong> 3046101679</p>
+                <p><strong>🔑 Referencia:</strong> ${referencia}</p>
                 <hr>
                 <p><i class="fas fa-info-circle"></i> <strong>Instrucciones:</strong></p>
                 <p>1. Escanea el código QR con la app de Nequi</p>
                 <p>2. Realiza el pago por el monto indicado</p>
-                <p>3. Toma una captura de pantalla del comprobante</p>
-                <p>4. Regresa a la página anterior y sube la captura</p>
+                <p>3. Haz clic en "Confirmar Pago" para generar tu recibo</p>
             `;
-            // Mostrar tarjeta de Nequi
             document.getElementById('nequiCard').style.display = 'block';
             document.getElementById('daviviendaCard').style.display = 'none';
         } else if (show === 'davivienda') {
             infoPago.innerHTML = `
                 <p><strong>💰 Monto a pagar:</strong> $${parseInt(monto).toLocaleString('es-CO')} COP</p>
                 <p><strong>🛒 Servicio:</strong> ${decodeURIComponent(servicio || 'No especificado')}</p>
-                <p><strong>📧 El programa se enviará a:</strong> ${decodeURIComponent(clienteEmail || 'No especificado')}</p>
-                <p><strong>🏦 Cuenta Davivienda:</strong> 9876543210</p>
+                <p><strong>🏦 Cuenta Davivienda:</strong>  </p>
+                <p><strong>🔑 Referencia:</strong> ${referencia}</p>
                 <hr>
                 <p><i class="fas fa-info-circle"></i> <strong>Instrucciones:</strong></p>
                 <p>1. Escanea el código QR con la app de Davivienda</p>
                 <p>2. Realiza el pago por el monto indicado</p>
-                <p>3. Toma una captura de pantalla del comprobante</p>
-                <p>4. Regresa a la página anterior y sube la captura</p>
+                <p>3. Haz clic en "Confirmar Pago" para generar tu recibo</p>
             `;
             document.getElementById('nequiCard').style.display = 'none';
             document.getElementById('daviviendaCard').style.display = 'block';
         }
-    } else {
-        document.getElementById('infoPago').style.display = 'none';
     }
     
-    // Cerrar ventana
+    // Confirmar pago y enviar mensaje a la ventana padre
+    function confirmarPago() {
+        if (!pagoInfo.monto) {
+            alert("No hay información de pago pendiente");
+            return;
+        }
+        
+        // Enviar mensaje a la ventana padre
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({
+                type: 'PAGO_CONFIRMADO',
+                metodo: pagoInfo.metodo,
+                referencia: pagoInfo.referencia,
+                monto: pagoInfo.monto,
+                servicio: pagoInfo.servicio
+            }, '*');
+            
+            alert(`✅ Pago confirmado exitosamente!\n\nMétodo: ${pagoInfo.metodo}\nReferencia: ${pagoInfo.referencia}\nMonto: $${parseInt(pagoInfo.monto).toLocaleString('es-CO')} COP\n\nGenerando recibo...`);
+            
+            // Cerrar la ventana después de 1 segundo
+            setTimeout(() => {
+                window.close();
+            }, 1000);
+        } else {
+            alert(`✅ Pago confirmado!\n\nMétodo: ${pagoInfo.metodo}\nReferencia: ${pagoInfo.referencia}\nMonto: $${parseInt(pagoInfo.monto).toLocaleString('es-CO')} COP`);
+        }
+    }
+    
+    // Eventos
+    document.getElementById('confirmarPagoBtn').addEventListener('click', confirmarPago);
     document.getElementById('cerrarVentanaBtn').addEventListener('click', () => {
         window.close();
     });

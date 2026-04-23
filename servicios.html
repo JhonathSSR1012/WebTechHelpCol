@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechHelpCol - Servicios</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -110,102 +108,6 @@
             border-color: #2ecc71;
         }
         
-        /* Sección de correo del cliente */
-        .email-section {
-            background: linear-gradient(135deg, #e8f8f0, #d4edda);
-            border-radius: 20px;
-            padding: 25px;
-            margin: 20px 0;
-            border: 2px solid #2ecc71;
-            text-align: center;
-        }
-        .email-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #0a2b3e;
-        }
-        .email-title i { color: #2ecc71; margin-right: 10px; }
-        .email-input {
-            width: 100%;
-            max-width: 400px;
-            padding: 15px 20px;
-            border: 2px solid #ddd;
-            border-radius: 50px;
-            font-size: 16px;
-            margin: 10px auto;
-            display: block;
-        }
-        .email-input:focus {
-            outline: none;
-            border-color: #2ecc71;
-        }
-        
-        /* Sección para enviar captura de pago */
-        .captura-section {
-            background: #f8f9fa;
-            border-radius: 20px;
-            padding: 25px;
-            margin: 20px 0;
-            border: 2px dashed #3498db;
-            text-align: center;
-        }
-        .captura-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #0a2b3e;
-        }
-        .captura-title i { color: #3498db; margin-right: 10px; }
-        .captura-input {
-            display: none;
-        }
-        .captura-label {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            margin: 10px;
-            transition: all 0.3s;
-        }
-        .captura-label:hover {
-            background: #2ecc71;
-            transform: scale(1.02);
-        }
-        .captura-preview {
-            max-width: 300px;
-            margin: 15px auto;
-            display: none;
-        }
-        .captura-preview img {
-            width: 100%;
-            border-radius: 12px;
-            border: 2px solid #2ecc71;
-        }
-        .btn-enviar-captura {
-            background: #2ecc71;
-            color: white;
-            border: none;
-            padding: 12px 35px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s;
-        }
-        .btn-enviar-captura:hover {
-            background: #27ae60;
-            transform: scale(1.02);
-        }
-        .btn-enviar-captura:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-        }
-        
         .payment-buttons {
             display: flex;
             gap: 20px;
@@ -251,11 +153,6 @@
             color: #721c24;
             display: block;
         }
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            display: block;
-        }
         
         .btn-volver {
             background: #2ecc71;
@@ -295,21 +192,6 @@
             cursor: pointer;
         }
         
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 20px; }
@@ -320,7 +202,7 @@
 <body>
 <div class="container">
     <h1><i class="fas fa-cogs"></i> Módulo de Servicios</h1>
-    <div class="sub">Selecciona un proyecto, realiza el pago y recibe el programa en tu correo</div>
+    <div class="sub">Selecciona un proyecto y realiza el pago para generar tu recibo</div>
 
     <!-- Lista de proyectos -->
     <div class="product-list" id="productList"></div>
@@ -333,16 +215,6 @@
         <div id="galleryContainer" class="gallery"></div>
     </div>
 
-    <!-- Sección de correo del cliente -->
-    <div class="email-section" id="emailSection">
-        <div class="email-title">
-            <i class="fas fa-envelope"></i> Correo para recibir el programa
-        </div>
-        <p style="margin-bottom: 15px; color: #666;">Después del pago, recibirás el programa en este correo electrónico</p>
-        <input type="email" id="clienteEmail" class="email-input" placeholder="ejemplo@correo.com" required>
-        <div id="emailAlert" class="alert"></div>
-    </div>
-
     <!-- Botones de pago -->
     <div class="payment-buttons">
         <button class="btn-pago btn-nequi" id="pagarNequi">
@@ -351,23 +223,6 @@
         <button class="btn-pago btn-davivienda" id="pagarDavivienda">
             <i class="fas fa-university"></i> Pagar con Davivienda
         </button>
-    </div>
-
-    <!-- Sección para enviar captura de pago -->
-    <div class="captura-section" id="capturaSection" style="display: none;">
-        <div class="captura-title">
-            <i class="fas fa-camera"></i> Enviar comprobante de pago
-        </div>
-        <p style="margin-bottom: 15px; color: #666;">Adjunta una captura de pantalla de tu pago para verificar la transacción</p>
-        <input type="file" id="capturaInput" class="captura-input" accept="image/jpeg,image/png,image/jpg">
-        <label for="capturaInput" class="captura-label">
-            <i class="fas fa-upload"></i> Seleccionar captura
-        </label>
-        <div id="capturaPreview" class="captura-preview"></div>
-        <button class="btn-enviar-captura" id="enviarCapturaBtn">
-            <i class="fas fa-paper-plane"></i> Enviar comprobante y recibir programa
-        </button>
-        <div id="capturaAlert" class="alert"></div>
     </div>
 
     <!-- Recibo -->
@@ -389,15 +244,6 @@
 </div>
 
 <script>
-    // ==================== CONFIGURACIÓN DE EMAILJS ====================
-    // REGISTRATE EN https://www.emailjs.com/ y obtén tus credenciales
-    const EMAILJS_PUBLIC_KEY = 'TU_PUBLIC_KEY';      // Reemplazar con tu Public Key
-    const EMAILJS_SERVICE_ID = 'TU_SERVICE_ID';      // Reemplazar con tu Service ID
-    const EMAILJS_TEMPLATE_ID = 'TU_TEMPLATE_ID';    // Reemplazar con tu Template ID
-    
-    // Inicializar EmailJS
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-    
     // ==================== CONFIGURACIÓN DE PROYECTOS ====================
     const proyectos = [
         { 
@@ -452,10 +298,7 @@
     };
     
     let proyectoSeleccionado = null;
-    let pagoConfirmado = false;
     let pagoRealizado = false;
-    let capturaSeleccionada = null;
-    let metodoPagoSeleccionado = null;
     
     // Función para cargar y mostrar las imágenes del proyecto seleccionado
     function cargarImagenesProyecto(proyectoId) {
@@ -490,139 +333,6 @@
         }, 1000);
     }
     
-    // Función para enviar correo con captura al administrador
-    async function enviarCapturaAlAdmin(clienteEmail, proyecto, monto, referencia, metodo, capturaData) {
-        const fecha = new Date().toLocaleString('es-CO');
-        const nombreProyecto = proyecto.nombre.replace('🏗️ ', '').replace('🏭 ', '').replace('🔐 ', '');
-        
-        // Parámetros para el correo al administrador
-        const adminTemplateParams = {
-            to_email: 'techhelp2026s@gmail.com',
-            cliente_email: clienteEmail,
-            proyecto_nombre: nombreProyecto,
-            monto: `$${monto.toLocaleString('es-CO')} COP`,
-            referencia: referencia,
-            fecha: fecha,
-            metodo: metodo,
-            captura: capturaData || 'No se adjuntó captura'
-        };
-        
-        try {
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, adminTemplateParams);
-            console.log('Correo enviado al administrador con captura');
-            return true;
-        } catch (error) {
-            console.error('Error enviando correo:', error);
-            return false;
-        }
-    }
-    
-    // Función para enviar correo al cliente (simulando envío del programa)
-    async function enviarProgramaAlCliente(clienteEmail, proyecto, monto, referencia, metodo) {
-        const fecha = new Date().toLocaleString('es-CO');
-        const nombreProyecto = proyecto.nombre.replace('🏗️ ', '').replace('🏭 ', '').replace('🔐 ', '');
-        
-        // Parámetros para el correo al cliente
-        const clienteTemplateParams = {
-            to_email: clienteEmail,
-            cliente_email: clienteEmail,
-            proyecto_nombre: nombreProyecto,
-            monto: `$${monto.toLocaleString('es-CO')} COP`,
-            referencia: referencia,
-            fecha: fecha,
-            metodo: metodo
-        };
-        
-        try {
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, clienteTemplateParams);
-            console.log('Correo enviado al cliente');
-            return true;
-        } catch (error) {
-            console.error('Error enviando correo al cliente:', error);
-            return false;
-        }
-    }
-    
-    // Función para confirmar pago después de enviar captura
-    async function confirmarPagoConCaptura() {
-        if (!proyectoSeleccionado) {
-            mostrarAlerta('capturaAlert', '⚠️ Selecciona un proyecto primero', 'error');
-            return;
-        }
-        
-        const clienteEmail = document.getElementById('clienteEmail').value.trim();
-        
-        if (!clienteEmail) {
-            mostrarAlerta('capturaAlert', '⚠️ Ingresa tu correo electrónico', 'error');
-            document.getElementById('clienteEmail').focus();
-            return;
-        }
-        
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clienteEmail)) {
-            mostrarAlerta('capturaAlert', '⚠️ Ingresa un correo electrónico válido', 'error');
-            document.getElementById('clienteEmail').focus();
-            return;
-        }
-        
-        if (!capturaSeleccionada) {
-            mostrarAlerta('capturaAlert', '⚠️ Adjunta una captura de pantalla del pago', 'error');
-            return;
-        }
-        
-        const referencia = `PAGO-${proyectoSeleccionado.id}-${Date.now()}`;
-        const monto = proyectoSeleccionado.precio;
-        
-        // Deshabilitar botón mientras se envía
-        const btnEnviar = document.getElementById('enviarCapturaBtn');
-        btnEnviar.disabled = true;
-        btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando comprobante...';
-        
-        try {
-            // Enviar captura al administrador
-            const adminEmailEnviado = await enviarCapturaAlAdmin(
-                clienteEmail, 
-                proyectoSeleccionado, 
-                monto, 
-                referencia, 
-                metodoPagoSeleccionado,
-                capturaSeleccionada
-            );
-            
-            // Enviar programa al cliente
-            const clienteEmailEnviado = await enviarProgramaAlCliente(
-                clienteEmail, 
-                proyectoSeleccionado, 
-                monto, 
-                referencia, 
-                metodoPagoSeleccionado
-            );
-            
-            if (adminEmailEnviado && clienteEmailEnviado) {
-                pagoConfirmado = true;
-                pagoRealizado = true;
-                
-                mostrarAlerta('capturaAlert', `✅ ¡Comprobante enviado! Se ha enviado el programa a ${clienteEmail}. El administrador verificará el pago.`, 'success');
-                
-                // Generar y mostrar recibo
-                const recibo = generarRecibo(metodoPagoSeleccionado, referencia, clienteEmail);
-                mostrarRecibo(recibo);
-                
-                // Ocultar sección de captura
-                document.getElementById('capturaSection').style.display = 'none';
-                
-                // Guardar en localStorage
-                localStorage.setItem('clienteEmail', clienteEmail);
-            } else {
-                mostrarAlerta('capturaAlert', '⚠️ Hubo un error enviando el comprobante. Intenta nuevamente.', 'error');
-            }
-        } catch (error) {
-            mostrarAlerta('capturaAlert', '❌ Error al enviar. Contacta a soporte.', 'error');
-        } finally {
-            btnEnviar.disabled = false;
-            btnEnviar.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar comprobante y recibir programa';
-        }
-    }
-    
     // Funciones para el modal de imágenes
     function abrirModal(src) {
         const modal = document.getElementById('modalImagen');
@@ -644,7 +354,7 @@
         alert.className = `alert alert-${tipo}`;
         setTimeout(() => {
             alert.className = 'alert';
-        }, 8000);
+        }, 5000);
     }
     
     // ========== RENDERIZAR PROYECTOS ==========
@@ -661,19 +371,14 @@
                 <div class="product-price">$${proy.precio.toLocaleString('es-CO')} COP</div>
                 <div style="font-size:13px; color:#666; margin:10px 0;">${proy.descripcion}</div>
                 <div class="product-status">
-                    <span class="status-badge badge-info">📧 Envío por correo</span>
+                    <span class="status-badge badge-info">💳 Pago con QR</span>
                 </div>
                 ${proyectoSeleccionado?.id === proy.id ? '<i class="fas fa-check-circle" style="color:#2ecc71; margin-top:10px; font-size:20px;"></i>' : ''}
             `;
             div.onclick = () => {
                 if (proyectoSeleccionado?.id !== proy.id) {
-                    pagoConfirmado = false;
                     pagoRealizado = false;
                     document.getElementById('recibo').classList.remove('visible');
-                    document.getElementById('capturaSection').style.display = 'none';
-                    capturaSeleccionada = null;
-                    document.getElementById('capturaPreview').innerHTML = '';
-                    document.getElementById('capturaPreview').style.display = 'none';
                 }
                 proyectoSeleccionado = proy;
                 renderizarProyectos();
@@ -684,7 +389,7 @@
     }
     
     // ========== GENERAR RECIBO ==========
-    function generarRecibo(metodoPago, referencia, clienteEmail) {
+    function generarRecibo(metodoPago, referencia) {
         if (!proyectoSeleccionado) return null;
         
         return {
@@ -695,7 +400,6 @@
             monto: proyectoSeleccionado.precio,
             metodo: metodoPago,
             referencia: referencia,
-            clienteEmail: clienteEmail,
             cliente: "Cliente Web - TechHelpCol"
         };
     }
@@ -710,15 +414,14 @@
             <p><strong>💰 Monto:</strong> $${recibo.monto.toLocaleString('es-CO')} COP</p>
             <p><strong>💳 Método de pago:</strong> ${recibo.metodo}</p>
             <p><strong>🔑 Referencia:</strong> ${recibo.referencia}</p>
-            <p><strong>📧 Enviado a:</strong> ${recibo.clienteEmail}</p>
             <hr>
-            <p><i class="fas fa-check-circle" style="color:#2ecc71; font-size:20px;"></i> <strong>¡Comprobante enviado exitosamente!</strong></p>
-            <p><i class="fas fa-envelope"></i> <strong>El programa ha sido enviado a tu correo electrónico</strong></p>
+            <p><i class="fas fa-check-circle" style="color:#2ecc71; font-size:20px;"></i> <strong>¡Pago registrado exitosamente!</strong></p>
             <p style="margin-top:15px; font-size:12px; color:#666;">📧 Soporte: techhelp2026s@gmail.com | 📱 Celular: 3046101679</p>
             <p style="font-size:11px; color:#999;">TechHelpCol - Soluciones Tecnológicas Integrales</p>
         `;
         document.getElementById('recibo').classList.add('visible');
         
+        // Guardar en historial
         const historial = JSON.parse(localStorage.getItem('historialCompras') || '[]');
         historial.unshift(recibo);
         localStorage.setItem('historialCompras', JSON.stringify(historial.slice(0, 20)));
@@ -732,33 +435,17 @@
         }
         
         if (pagoRealizado) {
-            alert("⚠️ Ya has enviado el comprobante para este proyecto. Revisa tu correo.");
+            alert("⚠️ Ya has realizado el pago para este proyecto. Puedes ver tu recibo arriba.");
             return;
         }
         
-        const clienteEmail = document.getElementById('clienteEmail').value.trim();
-        
-        if (!clienteEmail) {
-            alert("⚠️ Por favor, ingresa tu correo electrónico para recibir el programa");
-            document.getElementById('clienteEmail').focus();
-            return;
-        }
-        
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clienteEmail)) {
-            alert("⚠️ Por favor, ingresa un correo electrónico válido");
-            document.getElementById('clienteEmail').focus();
-            return;
-        }
-        
-        metodoPagoSeleccionado = metodo === 'NEQUI' ? 'Nequi' : 'Davivienda';
+        const referencia = `PAGO-${proyectoSeleccionado.id}-${Date.now()}`;
+        const metodoNombre = metodo === 'NEQUI' ? 'Nequi' : 'Davivienda';
         const monto = proyectoSeleccionado.precio;
         const servicio = proyectoSeleccionado.nombre;
         
-        // Guardar email en localStorage
-        localStorage.setItem('clienteEmail', clienteEmail);
-        
         // Abrir ventana con QR de pago
-        const urlPago = `pagos.html?show=${metodo === 'NEQUI' ? 'nequi' : 'davivienda'}&monto=${monto}&servicio=${encodeURIComponent(servicio)}&email=${encodeURIComponent(clienteEmail)}`;
+        const urlPago = `pagos.html?show=${metodo === 'NEQUI' ? 'nequi' : 'davivienda'}&monto=${monto}&servicio=${encodeURIComponent(servicio)}`;
         
         // Abrir ventana de pago
         const ventanaPago = window.open(urlPago, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
@@ -768,38 +455,32 @@
             return;
         }
         
-        // Mostrar sección para enviar captura
-        document.getElementById('capturaSection').style.display = 'block';
-        
-        // Scroll a la sección de captura
-        document.getElementById('capturaSection').scrollIntoView({ behavior: 'smooth' });
-    }
-    
-    // ========== MANEJAR CAPTURA ==========
-    const capturaInput = document.getElementById('capturaInput');
-    const capturaPreview = document.getElementById('capturaPreview');
-    
-    capturaInput.addEventListener('change', (e) => {
-        const archivo = e.target.files[0];
-        if (archivo && archivo.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                capturaSeleccionada = ev.target.result;
-                capturaPreview.innerHTML = `<img src="${ev.target.result}" alt="Captura de pago">`;
-                capturaPreview.style.display = 'block';
-                mostrarAlerta('capturaAlert', '✅ Captura seleccionada. Haz clic en "Enviar comprobante"', 'success');
-            };
-            reader.readAsDataURL(archivo);
-        } else if (archivo) {
-            mostrarAlerta('capturaAlert', '❌ Por favor, selecciona una imagen válida (JPG, PNG)', 'error');
-            capturaSeleccionada = null;
+        // Esperar a que el usuario confirme el pago en la ventana emergente
+        // Escuchar mensaje de confirmación
+        function recibirConfirmacion(event) {
+            if (event.data && event.data.type === 'PAGO_CONFIRMADO') {
+                window.removeEventListener('message', recibirConfirmacion);
+                pagoRealizado = true;
+                
+                mostrarAlerta('recibo', `✅ Pago confirmado!`, 'success');
+                
+                // Generar y mostrar recibo
+                const recibo = generarRecibo(metodoNombre, event.data.referencia || referencia);
+                mostrarRecibo(recibo);
+                
+                // Cerrar la ventana de pago si aún está abierta
+                if (ventanaPago && !ventanaPago.closed) {
+                    ventanaPago.close();
+                }
+            }
         }
-    });
+        
+        window.addEventListener('message', recibirConfirmacion);
+    }
     
     // ========== EVENTOS ==========
     document.getElementById('pagarNequi').onclick = () => procesarPago('NEQUI');
     document.getElementById('pagarDavivienda').onclick = () => procesarPago('DAVIVIENDA');
-    document.getElementById('enviarCapturaBtn').onclick = confirmarPagoConCaptura;
     
     document.getElementById('imprimirRecibo').onclick = () => {
         const contenido = document.getElementById('reciboContent').innerHTML;
@@ -822,12 +503,6 @@
         `);
         ventana.document.close();
     };
-    
-    // Cargar email guardado
-    const emailGuardado = localStorage.getItem('clienteEmail');
-    if (emailGuardado) {
-        document.getElementById('clienteEmail').value = emailGuardado;
-    }
     
     // ========== INICIALIZAR ==========
     renderizarProyectos();
