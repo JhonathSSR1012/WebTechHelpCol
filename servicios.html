@@ -379,6 +379,7 @@
     let proyectoSeleccionado = null;
     let pagoConfirmado = false;
     let pagoRealizado = false;
+    let pendingPayment = null;
     
     // Función para cargar y mostrar las imágenes del proyecto seleccionado
     function cargarImagenesProyecto(proyectoId) {
@@ -421,7 +422,6 @@
         const pagoConfirmacionDiv = document.getElementById('pagoConfirmacion');
         
         if (pagoConfirmado) {
-            // Habilitar el botón con el enlace real de Drive
             btnDrive.innerHTML = `<i class="fab fa-google-drive"></i> Descargar ${proyectoSeleccionado.nombre}`;
             btnDrive.className = 'btn-drive';
             btnDrive.disabled = false;
@@ -439,21 +439,31 @@
         }
     }
     
-    // Función para simular confirmación de pago
-    function confirmarPago(metodo, referencia) {
+    // Función para confirmar pago (llamada desde la ventana de pagos)
+    function confirmarPagoDesdeVentana(metodo, referencia, monto) {
         pagoConfirmado = true;
         pagoRealizado = true;
         
-        // Habilitar el enlace de Drive
         habilitarDescargaDrive();
-        
-        // Mostrar mensaje de confirmación
         mostrarAlerta('downloadAlert', `✅ Pago confirmado por ${metodo}. ¡Ya puedes descargar el proyecto!`, 'success');
         
-        // Generar y mostrar recibo
         const recibo = generarRecibo(metodo, referencia);
         mostrarRecibo(recibo);
+        
+        // Limpiar pendingPayment
+        pendingPayment = null;
     }
+    
+    // Escuchar mensajes desde la ventana de pagos
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'PAGO_CONFIRMADO') {
+            console.log('Pago confirmado recibido:', event.data);
+            confirmarPagoDesdeVentana(event.data.metodo, event.data.referencia, event.data.monto);
+            
+            // Mostrar mensaje adicional
+            alert(`✅ ¡Pago confirmado!\n\nMétodo: ${event.data.metodo}\nReferencia: ${event.data.referencia}\nMonto: $${parseInt(event.data.monto).toLocaleString('es-CO')} COP\n\nEl enlace de descarga ya está disponible.`);
+        }
+    });
     
     // Funciones para el modal de imágenes
     function abrirModal(src) {
@@ -498,11 +508,12 @@
                 ${proyectoSeleccionado?.id === proy.id ? '<i class="fas fa-check-circle" style="color:#2ecc71; margin-top:10px; font-size:20px;"></i>' : ''}
             `;
             div.onclick = () => {
-                // Resetear estado de pago al cambiar de proyecto
                 if (proyectoSeleccionado?.id !== proy.id) {
                     pagoConfirmado = false;
                     pagoRealizado = false;
                     habilitarDescargaDrive();
+                    // Ocultar recibo al cambiar de proyecto
+                    document.getElementById('recibo').classList.remove('visible');
                 }
                 proyectoSeleccionado = proy;
                 renderizarProyectos();
@@ -565,41 +576,26 @@
         }
         
         const referencia = `PAGO-${proyectoSeleccionado.id}-${Date.now()}`;
+        const metodoNombre = metodo === 'NEQUI' ? 'Nequi' : 'Davivienda';
+        const monto = proyectoSeleccionado.precio;
+        const servicio = proyectoSeleccionado.nombre;
         
-        const qrNequi = localStorage.getItem('qrNequi');
-        const qrDavivienda = localStorage.getItem('qrDavivienda');
+        // Guardar información de pago pendiente
+        pendingPayment = {
+            referencia: referencia,
+            metodo: metodoNombre,
+            monto: monto,
+            proyecto: proyectoSeleccionado.id
+        };
         
-        let urlPago = "";
-        let metodoNombre = "";
-        
-        if (metodo === 'NEQUI') {
-            metodoNombre = "Nequi";
-            if (qrNequi && qrNequi.startsWith('data:image')) {
-                urlPago = `pagos.html?show=nequi&monto=${proyectoSeleccionado.precio}&ref=${referencia}&servicio=${encodeURIComponent(proyectoSeleccionado.nombre)}`;
-            } else {
-                urlPago = `https://nequi.com.co/transferir?numero=3046101679&valor=${proyectoSeleccionado.precio}&referencia=${referencia}`;
-            }
-        } else {
-            metodoNombre = "Davivienda";
-            if (qrDavivienda && qrDavivienda.startsWith('data:image')) {
-                urlPago = `pagos.html?show=davivienda&monto=${proyectoSeleccionado.precio}&ref=${referencia}&servicio=${encodeURIComponent(proyectoSeleccionado.nombre)}`;
-            } else {
-                urlPago = `https://www.davivienda.com/pse?monto=${proyectoSeleccionado.precio}&referencia=${referencia}`;
-            }
-        }
+        // Redirigir a la página de pagos con los parámetros
+        const urlPago = `pagos.html?show=${metodo === 'NEQUI' ? 'nequi' : 'davivienda'}&monto=${monto}&ref=${referencia}&servicio=${encodeURIComponent(servicio)}&return=servicios.html`;
         
         // Abrir ventana de pago
-        const ventanaPago = window.open(urlPago, '_blank');
+        const ventanaPago = window.open(urlPago, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
         
-        // Simular confirmación de pago después de que el usuario complete el pago
-        // En un caso real, esto vendría de un webhook o callback del banco
-        const confirmar = confirm(`💰 ¿Ya realizaste el pago de $${proyectoSeleccionado.precio.toLocaleString('es-CO')} COP por ${metodoNombre}?\n\nReferencia: ${referencia}\n\nHaz clic en "Aceptar" para confirmar el pago y habilitar la descarga.`);
-        
-        if (confirmar) {
-            confirmarPago(metodoNombre, referencia);
-            mostrarAlerta('downloadAlert', `✅ Pago confirmado. Ya puedes descargar el proyecto desde Google Drive.`, 'success');
-        } else {
-            mostrarAlerta('downloadAlert', `⚠️ Pago pendiente. Una vez confirmado el pago, podrás descargar el proyecto.`, 'info');
+        if (!ventanaPago) {
+            alert("⚠️ Por favor, permite ventanas emergentes para continuar con el pago.");
         }
     }
     

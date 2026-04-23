@@ -45,7 +45,6 @@
         .qr-card.nequi { border-top: 5px solid #7a2be0; }
         .qr-card.davivienda { border-top: 5px solid #e31e24; }
         
-        /* IMAGEN GRANDE DEL QR */
         .qr-grande {
             width: 100%;
             max-width: 400px;
@@ -146,20 +145,33 @@
         }
         .pago-modal.visible { display: block; }
         
-        .btn-cerrar {
+        .btn-confirmar {
             background: #2ecc71;
             color: white;
             border: none;
-            padding: 12px 30px;
+            padding: 14px 35px;
             border-radius: 50px;
             margin-top: 20px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 18px;
+            transition: all 0.3s;
         }
-        .btn-cerrar:hover {
+        .btn-confirmar:hover {
             background: #27ae60;
             transform: scale(1.02);
+        }
+        
+        .btn-cerrar {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
         }
         
         .btn-volver {
@@ -192,6 +204,13 @@
             color: #333;
         }
         
+        .botones-accion {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
         @media (max-width: 768px) {
             .qr-card { min-width: 320px; }
             .opcion-img { width: 60px; height: 60px; }
@@ -210,13 +229,11 @@
         <div class="qr-card nequi">
             <h2><i class="fas fa-mobile-alt" style="color:#7a2be0;"></i> Nequi</h2>
             
-            <!-- Selector de imágenes predeterminadas -->
             <div class="selector-imagenes">
                 <div class="selector-titulo"><i class="fas fa-images"></i> Selecciona el código QR de Nequi:</div>
                 <div class="opciones-imagenes" id="opcionesNequi"></div>
             </div>
             
-            <!-- Imagen GRANDE del QR -->
             <div class="qr-titulo">📱 Código QR para pago</div>
             <div class="qr-grande" id="qrGrandeNequi">
                 <div class="qr-placeholder" id="placeholderNequi">
@@ -236,13 +253,11 @@
         <div class="qr-card davivienda">
             <h2><i class="fas fa-university" style="color:#e31e24;"></i> Davivienda</h2>
             
-            <!-- Selector de imágenes predeterminadas -->
             <div class="selector-imagenes">
                 <div class="selector-titulo"><i class="fas fa-images"></i> Selecciona el código QR de Davivienda:</div>
                 <div class="opciones-imagenes" id="opcionesDavivienda"></div>
             </div>
             
-            <!-- Imagen GRANDE del QR -->
             <div class="qr-titulo">🏦 Código QR para pago</div>
             <div class="qr-grande" id="qrGrandeDavivienda">
                 <div class="qr-placeholder" id="placeholderDavivienda">
@@ -253,7 +268,7 @@
             </div>
             
             <div class="info-cuenta">
-                <i class="fas fa-building"></i> <strong>Cuenta Davivienda:</strong> <br>
+                <i class="fas fa-building"></i> <strong>Cuenta Davivienda:</strong> 9876543210<br>
                 <small>Número de cuenta para transferencias</small>
             </div>
         </div>
@@ -264,7 +279,14 @@
         <h3><i class="fas fa-credit-card"></i> Escanea para pagar</h3>
         <div id="pagoInfo"></div>
         <div id="qrDisplay" style="margin: 20px 0;"></div>
-        <button class="btn-cerrar" id="cerrarModal">Cerrar</button>
+        <div class="botones-accion">
+            <button class="btn-confirmar" id="confirmarPagoBtn">
+                <i class="fas fa-check-circle"></i> Confirmar Pago
+            </button>
+            <button class="btn-cerrar" id="cerrarModal">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        </div>
     </div>
 
     <div class="footer">
@@ -289,6 +311,15 @@
             descripcion: "Código QR para pagos con Davivienda"
         }
     ];
+    
+    // Variables para almacenar información del pago
+    let pagoInfo = {
+        metodo: null,
+        monto: null,
+        referencia: null,
+        servicio: null,
+        returnUrl: null
+    };
     
     // Función para verificar si una imagen existe
     function verificarImagen(url, callback) {
@@ -338,25 +369,18 @@
     const qrGrandeNequi = document.getElementById('qrGrandeNequi');
     
     function guardarQRNequi(qrData, nombreOrigen) {
-        // Mostrar imagen grande
         imgNequi.src = qrData;
         imgNequi.style.display = 'block';
         placeholderNequi.style.display = 'none';
-        
-        // Guardar en localStorage
         localStorage.setItem('qrNequi', qrData);
         localStorage.setItem('qrNequiNombre', nombreOrigen);
-        
-        // Efecto visual de éxito
         qrGrandeNequi.style.border = '3px solid #2ecc71';
         setTimeout(() => {
             qrGrandeNequi.style.border = '3px solid #e0e0e0';
         }, 500);
-        
         alert(`✅ QR de Nequi cargado correctamente`);
     }
     
-    // Seleccionar imagen predeterminada
     cargarOpcionesImagenes('opcionesNequi', imagenesNequiPredeterminadas, 'nequi', (url, nombre) => {
         guardarQRNequi(url, nombre);
     });
@@ -367,25 +391,18 @@
     const qrGrandeDavivienda = document.getElementById('qrGrandeDavivienda');
     
     function guardarQRDavivienda(qrData, nombreOrigen) {
-        // Mostrar imagen grande
         imgDavivienda.src = qrData;
         imgDavivienda.style.display = 'block';
         placeholderDavivienda.style.display = 'none';
-        
-        // Guardar en localStorage
         localStorage.setItem('qrDavivienda', qrData);
         localStorage.setItem('qrDaviviendaNombre', nombreOrigen);
-        
-        // Efecto visual de éxito
         qrGrandeDavivienda.style.border = '3px solid #2ecc71';
         setTimeout(() => {
             qrGrandeDavivienda.style.border = '3px solid #e0e0e0';
         }, 500);
-        
         alert(`✅ QR de Davivienda cargado correctamente`);
     }
     
-    // Seleccionar imagen predeterminada
     cargarOpcionesImagenes('opcionesDavivienda', imagenesDaviviendaPredeterminadas, 'davivienda', (url, nombre) => {
         guardarQRDavivienda(url, nombre);
     });
@@ -411,10 +428,19 @@
     const monto = urlParams.get('monto');
     const referencia = urlParams.get('ref');
     const servicio = urlParams.get('servicio');
+    const returnUrl = urlParams.get('return');
     
     if (show) {
+        pagoInfo = {
+            metodo: show === 'nequi' ? 'Nequi' : 'Davivienda',
+            monto: monto,
+            referencia: referencia,
+            servicio: servicio,
+            returnUrl: returnUrl || 'servicios.html'
+        };
+        
         const modal = document.getElementById('pagoModal');
-        const pagoInfo = document.getElementById('pagoInfo');
+        const pagoInfoDiv = document.getElementById('pagoInfo');
         const qrDisplay = document.getElementById('qrDisplay');
         
         modal.classList.add('visible');
@@ -422,7 +448,7 @@
         if (show === 'nequi') {
             const qr = localStorage.getItem('qrNequi');
             const qrNombre = localStorage.getItem('qrNequiNombre') || 'QR Nequi';
-            pagoInfo.innerHTML = `
+            pagoInfoDiv.innerHTML = `
                 <p><strong>💰 Monto a pagar:</strong> $${parseInt(monto).toLocaleString('es-CO')} COP</p>
                 <p><strong>🔑 Referencia:</strong> ${referencia}</p>
                 <p><strong>🛒 Servicio:</strong> ${decodeURIComponent(servicio || 'No especificado')}</p>
@@ -434,7 +460,7 @@
         } else if (show === 'davivienda') {
             const qr = localStorage.getItem('qrDavivienda');
             const qrNombre = localStorage.getItem('qrDaviviendaNombre') || 'QR Davivienda';
-            pagoInfo.innerHTML = `
+            pagoInfoDiv.innerHTML = `
                 <p><strong>💰 Monto a pagar:</strong> $${parseInt(monto).toLocaleString('es-CO')} COP</p>
                 <p><strong>🔑 Referencia:</strong> ${referencia}</p>
                 <p><strong>🛒 Servicio:</strong> ${decodeURIComponent(servicio || 'No especificado')}</p>
@@ -450,12 +476,51 @@
         }, 100);
     }
     
+    // ========== CONFIRMAR PAGO ==========
+    function confirmarPago() {
+        if (!pagoInfo.monto) {
+            alert("No hay información de pago pendiente");
+            return;
+        }
+        
+        // Enviar mensaje a la ventana padre (servicios.html)
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({
+                type: 'PAGO_CONFIRMADO',
+                metodo: pagoInfo.metodo,
+                referencia: pagoInfo.referencia,
+                monto: pagoInfo.monto,
+                servicio: pagoInfo.servicio
+            }, '*');
+            
+            alert(`✅ Pago confirmado exitosamente!\n\nMétodo: ${pagoInfo.metodo}\nReferencia: ${pagoInfo.referencia}\nMonto: $${parseInt(pagoInfo.monto).toLocaleString('es-CO')} COP\n\nCerrando esta ventana...`);
+            
+            // Cerrar la ventana después de 1 segundo
+            setTimeout(() => {
+                window.close();
+            }, 1000);
+        } else {
+            // Si no hay ventana padre, redirigir
+            alert(`✅ Pago confirmado!\n\nMétodo: ${pagoInfo.metodo}\nReferencia: ${pagoInfo.referencia}\nMonto: $${parseInt(pagoInfo.monto).toLocaleString('es-CO')} COP\n\nRedirigiendo...`);
+            window.location.href = pagoInfo.returnUrl || 'servicios.html';
+        }
+    }
+    
     // Cerrar modal
-    const cerrarModal = document.getElementById('cerrarModal');
-    if (cerrarModal) {
-        cerrarModal.addEventListener('click', () => {
+    const confirmarBtn = document.getElementById('confirmarPagoBtn');
+    if (confirmarBtn) {
+        confirmarBtn.addEventListener('click', confirmarPago);
+    }
+    
+    const cerrarModalBtn = document.getElementById('cerrarModal');
+    if (cerrarModalBtn) {
+        cerrarModalBtn.addEventListener('click', () => {
             document.getElementById('pagoModal').classList.remove('visible');
-            window.history.replaceState({}, document.title, window.location.pathname);
+            if (window.opener && !window.opener.closed) {
+                window.close();
+            } else {
+                window.location.href = 'servicios.html';
+            }
         });
     }
     
