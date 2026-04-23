@@ -724,32 +724,7 @@
         localStorage.setItem('historialCompras', JSON.stringify(historial.slice(0, 20)));
     }
     
-    // ========== PROCESAR PAGO ==========
-    async function procesarPago(metodo) {
-        if (!proyectoSeleccionado) {
-            alert("⚠️ Por favor, selecciona un proyecto primero");
-            return;
-        }
-        
-        if (pagoRealizado) {
-            alert("⚠️ Ya has enviado el comprobante para este proyecto. Revisa tu correo.");
-            return;
-        }
-        
-        const clienteEmail = document.getElementById('clienteEmail').value.trim();
-        
-        if (!clienteEmail) {
-            alert("⚠️ Por favor, ingresa tu correo electrónico para recibir el programa");
-            document.getElementById('clienteEmail').focus();
-            return;
-        }
-        
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clienteEmail)) {
-            alert("⚠️ Por favor, ingresa un correo electrónico válido");
-            document.getElementById('clienteEmail').focus();
-            return;
-        }
-        
+            
         metodoPagoSeleccionado = metodo === 'NEQUI' ? 'Nequi' : 'Davivienda';
         const monto = proyectoSeleccionado.precio;
         const servicio = proyectoSeleccionado.nombre;
@@ -768,33 +743,9 @@
             return;
         }
         
-        // Mostrar sección para enviar captura
-        document.getElementById('capturaSection').style.display = 'block';
-        
-        // Scroll a la sección de captura
-        document.getElementById('capturaSection').scrollIntoView({ behavior: 'smooth' });
     }
     
-    // ========== MANEJAR CAPTURA ==========
-    const capturaInput = document.getElementById('capturaInput');
-    const capturaPreview = document.getElementById('capturaPreview');
     
-    capturaInput.addEventListener('change', (e) => {
-        const archivo = e.target.files[0];
-        if (archivo && archivo.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                capturaSeleccionada = ev.target.result;
-                capturaPreview.innerHTML = `<img src="${ev.target.result}" alt="Captura de pago">`;
-                capturaPreview.style.display = 'block';
-                mostrarAlerta('capturaAlert', '✅ Captura seleccionada. Haz clic en "Enviar comprobante"', 'success');
-            };
-            reader.readAsDataURL(archivo);
-        } else if (archivo) {
-            mostrarAlerta('capturaAlert', '❌ Por favor, selecciona una imagen válida (JPG, PNG)', 'error');
-            capturaSeleccionada = null;
-        }
-    });
     
     // ========== EVENTOS ==========
     document.getElementById('pagarNequi').onclick = () => procesarPago('NEQUI');
