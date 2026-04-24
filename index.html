@@ -25,18 +25,66 @@
             top: 0;
             z-index: 1000;
         }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-img {
+            height: 50px;
+            width: auto;
+            border-radius: 10px;
+        }
         .logo h1 { font-size: 1.7rem; }
         .logo span { color: #2ecc71; }
         .nav-links { display: flex; gap: 1.8rem; flex-wrap: wrap; }
         .nav-links a { color: white; text-decoration: none; font-weight: 500; }
         .nav-links a:hover { color: #2ecc71; }
+        
+        /* Hero con imagen de fondo o imagen destacada */
         .hero {
             background: linear-gradient(135deg, #0e3b4b, #0a2b3e);
             color: white;
             text-align: center;
             padding: 3rem 1rem;
+            position: relative;
         }
-        .hero h2 { font-size: 2.2rem; }
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .hero-text {
+            flex: 1;
+            text-align: left;
+        }
+        .hero-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .hero-text p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        .hero-image img:hover {
+            transform: scale(1.02);
+        }
+        
         .container { max-width: 1300px; margin: 2rem auto; padding: 0 1.5rem; }
         .section-title {
             text-align: center;
@@ -58,6 +106,10 @@
             padding: 1.5rem;
             box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             border-left: 5px solid #2ecc71;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
         }
         .card i { font-size: 2.2rem; color: #2ecc71; margin-bottom: 1rem; }
         .modulos-acceso {
@@ -80,6 +132,46 @@
         }
         .modulo-card:hover { transform: translateY(-10px); background: #e8f5e9; }
         .modulo-card i { font-size: 3rem; color: #2ecc71; margin-bottom: 1rem; }
+        
+        .contacto-section {
+            background: linear-gradient(135deg, #e8f8f0, #d4edda);
+            border-radius: 30px;
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+        }
+        .contacto-section h2 {
+            color: #0a2b3e;
+            margin-bottom: 20px;
+        }
+        .contacto-section h2 i {
+            color: #2ecc71;
+            margin-right: 10px;
+        }
+        .contacto-section p {
+            margin-bottom: 25px;
+            color: #555;
+        }
+        .btn-contacto {
+            background: #0a2b3e;
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        .btn-contacto:hover {
+            background: #2ecc71;
+            transform: scale(1.05);
+        }
+        
         footer {
             background: #0a2b3e;
             color: #ccc;
@@ -87,24 +179,40 @@
             padding: 2rem;
             margin-top: 3rem;
         }
-        @media (max-width: 700px) { .navbar { flex-direction: column; gap: 0.8rem; } }
+        @media (max-width: 700px) { 
+            .navbar { flex-direction: column; gap: 0.8rem; }
+            .contacto-section { padding: 25px; }
+            .hero-content { flex-direction: column; text-align: center; }
+            .hero-text { text-align: center; }
+            .logo-img { height: 40px; }
+        }
     </style>
 </head>
 <body>
 <nav class="navbar">
-    <div class="logo"><h1>Tech<span>HelpCol</span></h1></div>
+    <div class="logo">
+        <img src="imagenes/TechHelpCol.png" alt="TechHelpCol Logo" class="logo-img" onerror="this.style.display='none'">
+        <h1>Tech<span>HelpCol</span></h1>
+    </div>
     <div class="nav-links">
         <a href="#inicio">Inicio</a>
         <a href="#servicios">Servicios</a>
         <a href="servicios.html" target="_blank">🛒 Comprar</a>
         <a href="pagos.html" target="_blank">💳 Pagos QR</a>
-        <a href="#contacto">Contacto</a>
+        <a href="formulario.html" target="_blank">📧 Contáctenos</a>
     </div>
 </nav>
 
 <section class="hero" id="inicio">
-    <h2>Portafolio de Servicios Tecnológicos</h2>
-    <p>Soluciones integrales para la estabilidad, seguridad y crecimiento de su infraestructura IT</p>
+    <div class="hero-content">
+        <div class="hero-text">
+            <h2>Portafolio de Servicios Tecnológicos</h2>
+            <p>Soluciones integrales para la estabilidad, seguridad y crecimiento de su infraestructura IT</p>
+        </div>
+        <div class="hero-image">
+            <img src="imagenes/TechHelpCol.png" alt="TechHelpCol - Soluciones Tecnológicas" onerror="this.src='https://via.placeholder.com/400x300?text=TechHelpCol'">
+        </div>
+    </div>
 </section>
 
 <div class="container">
@@ -118,24 +226,38 @@
         <div class="card"><i class="fas fa-shield-alt"></i><h3>Seguridad Informática</h3><p>Políticas de seguridad, VPN cifrada, control de accesos.</p></div>
     </div>
 
+    <!-- Sección de Contacto -->
+    <div class="contacto-section">
+        <h2><i class="fas fa-envelope"></i> ¿Necesitas ayuda?</h2>
+        <p>Contáctanos para recibir asesoría personalizada sobre nuestros servicios tecnológicos</p>
+        <a href="formulario.html" class="btn-contacto" target="_blank">
+            <i class="fas fa-paper-plane"></i> Ir al Formulario de Contacto
+        </a>
+    </div>
+
     <div class="title-wrapper"><span class="section-title">Acceso Rápido</span></div>
     <div class="modulos-acceso">
         <a href="servicios.html" class="modulo-card" target="_blank">
             <i class="fas fa-shopping-cart"></i>
             <h3>Módulo Servicios</h3>
-            <p>Compra, adjunta archivos y genera recibo</p>
+            <p>Compra y genera recibo</p>
         </a>
         <a href="pagos.html" class="modulo-card" target="_blank">
             <i class="fas fa-qrcode"></i>
             <h3>Módulo Pagos QR</h3>
             <p>Configura tus códigos QR</p>
         </a>
+        <a href="formulario.html" class="modulo-card" target="_blank">
+            <i class="fas fa-headset"></i>
+            <h3>Soporte y Contacto</h3>
+            <p>Envíanos tus consultas</p>
+        </a>
     </div>
 </div>
 
 <footer id="contacto">
     <p><i class="far fa-envelope"></i> techhelp2026s@gmail.com | <i class="fas fa-phone-alt"></i> 3046101679</p>
-    <p>© 2025 TechHelpCol</p>
+    <p>© 2025 TechHelpCol | Todos los derechos reservados</p>
 </footer>
 </body>
 </html>
