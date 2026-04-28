@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechHelpCol - ¿Quiénes Somos?</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f7fa 0%, #e2edf2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Tarjeta principal */
+        .main-card {
+            background: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: transform 0.3s ease;
+        }
+
+        .main-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Encabezado */
+        .header {
+            background: linear-gradient(135deg, #0a2b3e, #1a4d6b);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(46,204,113,0.05)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x bottom;
+            background-size: cover;
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 i {
+            color: #2ecc71;
+            margin-right: 15px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Contenido principal */
+        .content {
+            padding: 50px 40px;
+        }
+
+        /* Tarjetas de valores */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .value-card {
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 35px 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #2ecc71, #27ae60);
+        }
+
+        .value-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px -15px rgba(0, 0, 0, 0.1);
+            border-color: #2ecc71;
+        }
+
+        .value-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+        }
+
+        .value-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .value-card h2 {
+            font-size: 1.8rem;
+            color: #0a2b3e;
+            margin-bottom: 20px;
+        }
+
+        .value-card p {
+            color: #475569;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* Misión y Visión */
+        .mission-vision {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .mv-card {
+            background: linear-gradient(135deg, #fef9e6, #fdf4d6);
+            border-radius: 24px;
+            padding: 30px;
+            border-left: 6px solid #2ecc71;
+            transition: all 0.3s;
+        }
+
+        .mv-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .mv-card i {
+            font-size: 2.5rem;
+            color: #2ecc71;
+            margin-bottom: 15px;
+        }
+
+        .mv-card h3 {
+            font-size: 1.5rem;
+            color: #0a2b3e;
+            margin-bottom: 15px;
+        }
+
+        .mv-card p {
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        /* Sección de años de operación */
+        .years-badge {
+            background: linear-gradient(135deg, #0a2b3e, #1a4d6b);
+            border-radius: 60px;
+            padding: 20px 35px;
+            text-align: center;
+            margin: 40px 0 30px;
+        }
+
+        .years-badge p {
+            color: white;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .years-badge i {
+            color: #2ecc71;
+            margin: 0 8px;
+        }
+
+        .years-badge strong {
+            color: #2ecc71;
+            font-size: 1.3rem;
+        }
+
+        /* Botón volver */
+        .back-button {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .btn-volver {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
+            background: linear-gradient(135deg, #27ae60, #219a52);
+        }
+
+        .btn-volver:active {
+            transform: translateY(0);
+        }
+
+        /* Footer de la página */
+        .page-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(29, 1, 1, 0.1);
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+
+            .header {
+                padding: 35px 25px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 30px 25px;
+            }
+
+            .values-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .value-card {
+                padding: 25px 20px;
+            }
+
+            .value-card h2 {
+                font-size: 1.5rem;
+            }
+
+            .mission-vision {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .years-badge {
+                padding: 15px 20px;
+            }
+
+            .years-badge p {
+                font-size: 0.9rem;
+            }
+
+            .btn-volver {
+                padding: 12px 28px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .value-icon {
+                width: 65px;
+                height: 65px;
+            }
+
+            .value-icon i {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="main-card">
+        <!-- Encabezado -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-users"></i>
+                ¿Quiénes Somos?
+            </h1>
+            <p>Conoce nuestro compromiso con la excelencia y la innovación tecnológica</p>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="content">
+            <!-- Grid de valores principales -->
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h2>Atención Personalizada</h2>
+                    <p>Escuchamos activamente cada necesidad y diseñamos soluciones a la medida de tu organización. Nuestro enfoque centrado en el cliente garantiza resultados que realmente marcan la diferencia.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h2>Soporte Continuo</h2>
+                    <p>Brindamos asistencia remota y presencial con tiempos de respuesta ágiles. Aseguramos la continuidad operativa de tu negocio mediante un acompañamiento constante y profesional.</p>
+                </div>
+            </div>
+
+            <!-- Misión y Visión -->
+            <div class="mission-vision">
+                <div class="mv-card">
+                    <i class="fas fa-bullseye"></i>
+                    <h3>Misión</h3>
+                    <p>Impulsar el crecimiento y la transformación digital de las organizaciones a través de soluciones tecnológicas innovadoras, confiables y adaptadas a sus necesidades específicas.</p>
+                </div>
+                <div class="mv-card">
+                    <i class="fas fa-eye"></i>
+                    <h3>Visión</h3>
+                    <p>Ser reconocidos como el aliado estratégico líder en infraestructura tecnológica, destacando por nuestra calidad humana, excelencia técnica y compromiso con el éxito de nuestros clientes.</p>
+                </div>
+            </div>
+
+            <!-- Valores adicionales en lista -->
+            <div style="background: #f1f5f9; border-radius: 24px; padding: 30px; margin-top: 20px;">
+                <h3 style="text-align: center; color: #0a2b3e; margin-bottom: 25px; font-size: 1.6rem;">
+                    <i class="fas fa-gem" style="color: #2ecc71; margin-right: 10px;"></i>
+                    Nuestros Valores
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 10px; background: white; padding: 12px 20px; border-radius: 50px;">
+                        <i class="fas fa-shield-alt" style="color: #2ecc71;"></i>
+                        <span>Confianza y Transparencia</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; background: white; padding: 12px 20px; border-radius: 50px;">
+                        <i class="fas fa-rocket" style="color: #2ecc71;"></i>
+                        <span>Innovación Constante</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; background: white; padding: 12px 20px; border-radius: 50px;">
+                        <i class="fas fa-handshake" style="color: #2ecc71;"></i>
+                        <span>Compromiso con el Cliente</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; background: white; padding: 12px 20px; border-radius: 50px;">
+                        <i class="fas fa-chart-line" style="color: #2ecc71;"></i>
+                        <span>Mejora Continua</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badge de años de operación -->
+            <div class="years-badge">
+                <p>
+                    <i class="fas fa-calendar-alt"></i>
+                    Operamos con excelencia desde 
+                    <strong>2026</strong>
+                    <i class="fas fa-arrow-right"></i>
+                    Consolidando alianzas estratégicas y soluciones tecnológicas de alto impacto
+                    <i class="fas fa-trophy"></i>
+                </p>
+            </div>
+
+            <!-- Texto adicional -->
+            <div style="text-align: center; margin: 30px 0 20px;">
+                <p style="color: #475569; line-height: 1.7;">
+                    <i class="fas fa-quote-left" style="color: #2ecc71; margin-right: 8px;"></i>
+                    En TechHelpCol, cada proyecto es una oportunidad para demostrar que la tecnología bien aplicada transforma negocios y construye futuro.
+                    <i class="fas fa-quote-right" style="color: #2ecc71; margin-left: 8px;"></i>
+                </p>
+            </div>
+
+            <!-- Botón volver al inicio -->
+            <div class="back-button">
+                <a href="index.html" class="btn-volver">
+                    <i class="fas fa-home"></i>
+                    Volver al inicio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer de página -->
+    <div class="page-footer">
+        <p><i class="far fa-copyright"></i> 2026 TechHelpCol - Soluciones Tecnológicas Integrales</p>
+        <p style="margin-top: 8px; font-size: 0.75rem;">Comprometidos con la transformación digital desde 2026</p>
+    </div>
+</div>
+</body>
+</html>
