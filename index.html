@@ -29,6 +29,8 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            text-decoration: none;
+            color: white;
         }
         .logo-img {
             height: 50px;
@@ -38,7 +40,7 @@
         .logo h1 { font-size: 1.7rem; }
         .logo span { color: #2ecc71; }
         .nav-links { display: flex; gap: 1.8rem; flex-wrap: wrap; }
-        .nav-links a { color: white; text-decoration: none; font-weight: 500; }
+        .nav-links a { color: white; text-decoration: none; font-weight: 500; transition: color 0.3s; }
         .nav-links a:hover { color: #2ecc71; }
         
         /* Hero con imagen de fondo o imagen destacada */
@@ -172,6 +174,13 @@
             transform: scale(1.05);
         }
         
+        /* Indicador de página activa */
+        .nav-links a.active {
+            color: #2ecc71;
+            border-bottom: 2px solid #2ecc71;
+            padding-bottom: 2px;
+        }
+        
         footer {
             background: #0a2b3e;
             color: #ccc;
@@ -179,29 +188,30 @@
             padding: 2rem;
             margin-top: 3rem;
         }
+        
         @media (max-width: 700px) { 
             .navbar { flex-direction: column; gap: 0.8rem; }
             .contacto-section { padding: 25px; }
             .hero-content { flex-direction: column; text-align: center; }
             .hero-text { text-align: center; }
             .logo-img { height: 40px; }
+            .nav-links { justify-content: center; gap: 1rem; }
         }
     </style>
 </head>
 <body>
 <nav class="navbar">
-    <div class="logo">
-        <img src="imagenes/TechHelpCol.png" alt="TechHelpCol Logo" class="logo-img" onerror="this.style.display='none'">
-        <h1>Tech<span>HelpCol</span></h1>
-    </div>
+    <a href="index.html" class="logo">
+        <img src="imagenes/InnovaTI.png" alt="InnovaTI Logo" class="logo-img" onerror="this.style.display='none'">
+        <h1>Inno<span>vaTI</span></h1>
+    </a>
     <div class="nav-links">
-        <a href="#inicio">⭐ Inicio</a>
-        <a href="quienes.html" target="_blank">🌍 Quienes Somos</a>
+        <a href="index.html" class="active">⭐ Inicio</a>
+        <a href="quienes.html">🌍 Quienes Somos</a>
         <a href="#servicios">⚙️ Servicios</a>
-        <a href="servicios.html" target="_blank">🛒 Comprar</a>
-        <a href="pagos.html" target="_blank">💳 Pagos QR</a>
-        <a href="formulario.html" target="_blank">📧 Contáctenos</a>
-        
+        <a href="servicios.html">🛒 Comprar</a>
+        <a href="pagos.html">💳 Pagos QR</a>
+        <a href="formulario.html">📧 Contáctenos</a>
     </div>
 </nav>
 
@@ -212,7 +222,7 @@
             <p>Soluciones integrales para la estabilidad, seguridad y crecimiento de su infraestructura IT</p>
         </div>
         <div class="hero-image">
-            <img src="imagenes/TechHelpCol.png" alt="TechHelpCol - Soluciones Tecnológicas" onerror="this.src='https://via.placeholder.com/400x300?text=TechHelpCol'">
+            <img src="imagenes/InnovaTI.png" alt="InnovaTI - Soluciones Tecnológicas" onerror="this.src='https://via.placeholder.com/400x300?text=InnovaTI'">
         </div>
     </div>
 </section>
@@ -232,39 +242,65 @@
     <div class="contacto-section">
         <h2><i class="fas fa-envelope"></i> ¿Necesitas ayuda?</h2>
         <p>Contáctanos para recibir asesoría personalizada sobre nuestros servicios tecnológicos</p>
-        <a href="formulario.html" class="btn-contacto" target="_blank">
+        <a href="formulario.html" class="btn-contacto">
             <i class="fas fa-paper-plane"></i> Ir al Formulario de Contacto
         </a>
     </div>
 
     <div class="title-wrapper"><span class="section-title">Acceso Rápido</span></div>
     <div class="modulos-acceso">
-        <a href="servicios.html" class="modulo-card" target="_blank">
+        <a href="servicios.html" class="modulo-card">
             <i class="fas fa-shopping-cart"></i>
             <h3>Módulo Servicios</h3>
             <p>Compra y genera recibo</p>
         </a>
-        <a href="pagos.html" class="modulo-card" target="_blank">
+        <a href="pagos.html" class="modulo-card">
             <i class="fas fa-qrcode"></i>
             <h3>Módulo Pagos QR</h3>
             <p>Configura tus códigos QR</p>
         </a>
-        <a href="formulario.html" class="modulo-card" target="_blank">
+        <a href="formulario.html" class="modulo-card">
             <i class="fas fa-headset"></i>
             <h3>Soporte y Contacto</h3>
             <p>Envíanos tus consultas</p>
         </a>
-        <a href="quienes.html" class="modulo-card" target="_blank">
-            <i class="fas fa-headset"></i>
-        <h3>Quienes Somos</h3>
-        <p>Misión y Visión</p>
+        <a href="quienes.html" class="modulo-card">
+            <i class="fas fa-users"></i>
+            <h3>Quienes Somos</h3>
+            <p>Misión y Visión</p>
         </a>
     </div>
 </div>
 
 <footer id="contacto">
     <p><i class="far fa-envelope"></i> techhelp2026s@gmail.com | <i class="fas fa-phone-alt"></i> 3046101679</p>
-    <p>© 2026 TechHelpCol | Todos los derechos reservados</p>
+    <p>© 2026 InnovaTI | Todos los derechos reservados</p>
 </footer>
+
+<script>
+    // Función para resaltar el enlace activo en la navegación
+    function setActiveLink() {
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+        const links = document.querySelectorAll('.nav-links a');
+        
+        links.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+            
+            // Si es un ancla (#), no lo consideramos como página
+            if (href && href.startsWith('#')) {
+                return;
+            }
+            
+            // Comparar la ruta actual con el href
+            if (href === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    }
+    
+    // Ejecutar al cargar la página
+    document.addEventListener('DOMContentLoaded', setActiveLink);
+</script>
 </body>
 </html>

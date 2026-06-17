@@ -170,6 +170,22 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        .btn-volver {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
         .btn-cerrar:hover {
             background: #7f8c8d;
         }
@@ -188,6 +204,20 @@
             margin: 10px 0;
             color: #333;
         }
+        .btn-volver:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
+            background: linear-gradient(135deg, #27ae60, #219a52);
+        }
+
+        .btn-volver:active {
+            transform: translateY(0);
+        }
+
+        .btn-volver {
+                padding: 12px 28px;
+                font-size: 1rem;
+            }
         
         @media (max-width: 768px) {
             .qr-card { min-width: 320px; }
@@ -458,5 +488,13 @@
         window.close();
     });
 </script>
+
+<!-- Botón volver al inicio -->
+            <div class="back-button">
+                <a href="index.html" class="btn-volver">
+                    <i class="fas fa-home"></i>
+                    Volver al inicio
+                </a>
+            </div>
 </body>
 </html>

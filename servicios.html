@@ -83,29 +83,110 @@
         }
         .gallery-title i { color: #2ecc71; margin-right: 10px; }
         
+        /* Estilos para la galería con scroll */
+        .gallery-wrapper {
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
         .gallery {
             display: flex;
-            flex-wrap: wrap;
             gap: 15px;
-            margin-top: 20px;
-            justify-content: center;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 10px 5px;
+            scrollbar-width: thin;
+            scrollbar-color: #2ecc71 #f0f0f0;
         }
+        
+        .gallery::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .gallery::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+        
+        .gallery::-webkit-scrollbar-thumb {
+            background: #2ecc71;
+            border-radius: 10px;
+        }
+        
         .gallery-item {
-            position: relative;
-            display: inline-block;
+            flex: 0 0 auto;
             cursor: pointer;
+            transition: transform 0.3s;
         }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+        
         .gallery-img {
-            width: 150px;
-            height: 150px;
+            width: 200px;
+            height: 200px;
             object-fit: cover;
             border-radius: 12px;
             border: 2px solid #ddd;
             transition: all 0.3s;
         }
+        
         .gallery-img:hover {
-            transform: scale(1.05);
             border-color: #2ecc71;
+        }
+        
+        /* Botones de navegación */
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .gallery-nav:hover {
+            background: #27ae60;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .gallery-nav:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        .gallery-nav-prev {
+            left: 10px;
+        }
+        
+        .gallery-nav-next {
+            right: 10px;
+        }
+        
+        .gallery-nav.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        /* Contador de imágenes */
+        .gallery-counter {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
         }
         
         .payment-buttons {
@@ -195,7 +276,12 @@
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 20px; }
-            .gallery-img { width: 100px; height: 100px; }
+            .gallery-img { width: 150px; height: 150px; }
+            .gallery-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -212,7 +298,16 @@
         <div class="gallery-title">
             <i class="fas fa-folder-open"></i> Imágenes del Proyecto Seleccionado
         </div>
-        <div id="galleryContainer" class="gallery"></div>
+        <div class="gallery-wrapper">
+            <button class="gallery-nav gallery-nav-prev" id="galleryPrev" aria-label="Anterior">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div id="galleryContainer" class="gallery"></div>
+            <button class="gallery-nav gallery-nav-next" id="galleryNext" aria-label="Siguiente">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="gallery-counter" id="galleryCounter">0 / 0 imágenes</div>
     </div>
 
     <!-- Botones de pago -->
@@ -250,22 +345,33 @@
             id: 1, 
             nombre: "🏗️ StarMarket_System - APP Supermercado", 
             descripcion: "Implementación de inventarios, pagos",
-            precio: 400000,
+            licenciamiento: "30 dias",
+            precio: 600000,
             carpeta: "StarMarket_System"
         },
         { 
             id: 2, 
             nombre: "🏭 LectorFactXML - Lector de facturación XML", 
-            descripcion: "Lector de facturación DIAN, convertidor de XML",
-            precio: 300000,
+            descripcion: "Lector de facturación DIAN, convertidor de XML, Descarga Masiva de Archivos con Token, Calendario Tributario",
+            licenciamiento: "180 dias",
+            precio: 800000,
             carpeta: "LectorFactXML"
         },
         { 
             id: 3, 
             nombre: "🔐 QRVentas - Sistema QR de Ventas", 
             descripcion: "Implementación de un sistema QR de ventas para tiendas, abarrotes, supermercados",
+            licenciamiento: "30 dias",
             precio: 440000,
             carpeta: "QRVentas"
+        },
+        { 
+            id: 4, 
+            nombre: "🔐 SchoolNote - Sistema Base de datos Colegio", 
+            descripcion: "Implementación de un sistema de Base de datos de Colegio, modulos de materias, profesores, estudiantes, sabana de notas",
+            licenciamiento: "365 dias",
+            precio: 1500000,
+            carpeta: "SchoolNote"
         }
     ];
     
@@ -294,43 +400,123 @@
             "QRVentas/imgQr3.png",
             "QRVentas/imgQr4.png",
             "QRVentas/imgQr5.png"
+        ],
+        4: [
+            "SchoolNote/Registro.png",
+            "SchoolNote/Licencia.png",
+            "SchoolNote/Modulos.png",
+            "SchoolNote/RegEstud.png",
+            "SchoolNote/Reg2.png",
+            "SchoolNote/Estudiante",
+            "SchoolNote/RegProfe.png",
+            "SchoolNote/Materias.png",
+            "SchoolNote/Notas.png",
+            "SchoolNote/Sabana.png"
         ]
     };
     
     let proyectoSeleccionado = null;
     let pagoRealizado = false;
     
+    // ========== FUNCIONES DE NAVEGACIÓN DE LA GALERÍA ==========
+    function scrollGallery(direction) {
+        const gallery = document.getElementById('galleryContainer');
+        const scrollAmount = gallery.firstElementChild ? 
+            gallery.firstElementChild.offsetWidth + 15 : 0; // width + gap
+        
+        if (direction === 'next') {
+            gallery.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        } else {
+            gallery.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+        
+        // Actualizar estado de los botones después del scroll
+        setTimeout(updateNavButtons, 100);
+    }
+    
+    function updateNavButtons() {
+        const gallery = document.getElementById('galleryContainer');
+        const prevBtn = document.getElementById('galleryPrev');
+        const nextBtn = document.getElementById('galleryNext');
+        
+        if (gallery.children.length === 0) {
+            prevBtn.classList.add('disabled');
+            nextBtn.classList.add('disabled');
+            return;
+        }
+        
+        const scrollLeft = gallery.scrollLeft;
+        const maxScroll = gallery.scrollWidth - gallery.clientWidth;
+        
+        // Actualizar botón anterior
+        if (scrollLeft <= 10) {
+            prevBtn.classList.add('disabled');
+        } else {
+            prevBtn.classList.remove('disabled');
+        }
+        
+        // Actualizar botón siguiente
+        if (scrollLeft >= maxScroll - 10) {
+            nextBtn.classList.add('disabled');
+        } else {
+            nextBtn.classList.remove('disabled');
+        }
+    }
+    
+    function updateCounter() {
+        const gallery = document.getElementById('galleryContainer');
+        const counter = document.getElementById('galleryCounter');
+        const total = gallery.children.length;
+        const visible = Math.ceil(gallery.clientWidth / (gallery.firstElementChild?.offsetWidth + 15 || 1));
+        counter.textContent = `${total} / ${total} imágenes`;
+    }
+    
     // Función para cargar y mostrar las imágenes del proyecto seleccionado
     function cargarImagenesProyecto(proyectoId) {
         const gallery = document.getElementById('galleryContainer');
         const imagenes = imagenesPorProyecto[proyectoId] || [];
         
+        // Limpiar galería
+        gallery.innerHTML = '';
+        
         if (imagenes.length === 0) {
-            gallery.innerHTML = '<p style="color:#999; text-align:center;">📷 No hay imágenes disponibles para este proyecto.</p>';
+            gallery.innerHTML = '<p style="color:#999; text-align:center; width:100%; padding:20px;">📷 No hay imágenes disponibles para este proyecto.</p>';
+            document.getElementById('galleryCounter').textContent = '0 / 0 imágenes';
+            document.getElementById('galleryPrev').classList.add('disabled');
+            document.getElementById('galleryNext').classList.add('disabled');
             return;
         }
         
-        gallery.innerHTML = '';
-        
+        // Agregar imágenes
         imagenes.forEach((imgUrl) => {
-            const img = new Image();
-            img.onload = () => {
-                const div = document.createElement('div');
-                div.className = 'gallery-item';
-                div.innerHTML = `
-                    <img src="${imgUrl}" class="gallery-img" onclick="abrirModal('${imgUrl}')">
-                `;
-                gallery.appendChild(div);
-            };
-            img.onerror = () => {};
+            const div = document.createElement('div');
+            div.className = 'gallery-item';
+            
+            const img = document.createElement('img');
             img.src = imgUrl;
+            img.className = 'gallery-img';
+            img.alt = `Imagen del proyecto ${proyectoSeleccionado?.nombre || ''}`;
+            img.onerror = function() {
+                this.style.display = 'none';
+                const errorMsg = document.createElement('p');
+                errorMsg.textContent = '❌ Error al cargar imagen';
+                errorMsg.style.color = '#e74c3c';
+                errorMsg.style.fontSize = '12px';
+                this.parentNode.appendChild(errorMsg);
+            };
+            img.onclick = function() {
+                abrirModal(this.src);
+            };
+            
+            div.appendChild(img);
+            gallery.appendChild(div);
         });
         
+        // Actualizar contador y botones
         setTimeout(() => {
-            if (gallery.children.length === 0) {
-                gallery.innerHTML = '<p style="color:#999; text-align:center;">⚠️ No se encontraron imágenes en la carpeta del proyecto.</p>';
-            }
-        }, 1000);
+            updateCounter();
+            updateNavButtons();
+        }, 100);
     }
     
     // Funciones para el modal de imágenes
@@ -339,11 +525,20 @@
         const imgAmpliada = document.getElementById('imagenAmpliada');
         modal.style.display = 'block';
         imgAmpliada.src = src;
+        document.body.style.overflow = 'hidden';
     }
     
     function cerrarModal() {
         document.getElementById('modalImagen').style.display = 'none';
+        document.body.style.overflow = 'auto';
     }
+    
+    // Cerrar modal con tecla ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            cerrarModal();
+        }
+    });
     
     window.abrirModal = abrirModal;
     window.cerrarModal = cerrarModal;
@@ -383,6 +578,11 @@
                 proyectoSeleccionado = proy;
                 renderizarProyectos();
                 cargarImagenesProyecto(proy.id);
+                
+                // Resetear el scroll de la galería al inicio
+                const gallery = document.getElementById('galleryContainer');
+                gallery.scrollLeft = 0;
+                updateNavButtons();
             };
             container.appendChild(div);
         });
@@ -417,7 +617,7 @@
             <hr>
             <p><i class="fas fa-check-circle" style="color:#2ecc71; font-size:20px;"></i> <strong>¡Pago registrado exitosamente!</strong></p>
             <p style="margin-top:15px; font-size:12px; color:#666;">📧 Soporte: techhelp2026s@gmail.com | 📱 Celular: 3046101679</p>
-            <p style="font-size:11px; color:#999;">TechHelpCol - Soluciones Tecnológicas Integrales</p>
+            <p style="font-size:11px; color:#999;">InnovaTI - Soluciones Tecnológicas Integrales</p>
         `;
         document.getElementById('recibo').classList.add('visible');
         
@@ -456,7 +656,6 @@
         }
         
         // Esperar a que el usuario confirme el pago en la ventana emergente
-        // Escuchar mensaje de confirmación
         function recibirConfirmacion(event) {
             if (event.data && event.data.type === 'PAGO_CONFIRMADO') {
                 window.removeEventListener('message', recibirConfirmacion);
@@ -503,6 +702,32 @@
         `);
         ventana.document.close();
     };
+    
+    // Eventos de navegación de la galería
+    document.getElementById('galleryPrev').addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (!this.classList.contains('disabled')) {
+            scrollGallery('prev');
+        }
+    });
+    
+    document.getElementById('galleryNext').addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (!this.classList.contains('disabled')) {
+            scrollGallery('next');
+        }
+    });
+    
+    // Actualizar botones al hacer scroll manual
+    document.getElementById('galleryContainer').addEventListener('scroll', function() {
+        updateNavButtons();
+    });
+    
+    // Actualizar al redimensionar la ventana
+    window.addEventListener('resize', function() {
+        updateNavButtons();
+        updateCounter();
+    });
     
     // ========== INICIALIZAR ==========
     renderizarProyectos();
