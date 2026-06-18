@@ -282,18 +282,6 @@
         </div>
     </div>
 
-    <!-- Información del pago -->
-    <div id="infoPago" class="info-pago"></div>
-
-    <div class="footer">
-        <button class="btn-confirmar" id="confirmarPagoBtn">
-            <i class="fas fa-check-circle"></i> Confirmar Pago
-        </button>
-        <button class="btn-cerrar" id="cerrarVentanaBtn">
-            <i class="fas fa-times"></i> Cancelar
-        </button>
-    </div>
-</div>
 
 <script>
     // ==================== CONFIGURACIÓN DE RUTAS LOCALES ====================
@@ -412,81 +400,8 @@
     const monto = urlParams.get('monto');
     const servicio = urlParams.get('servicio');
     
-    if (show) {
-        const infoPago = document.getElementById('infoPago');
-        const referencia = `PAGO-${Date.now()}-${Math.floor(Math.random()*10000)}`;
-        
-        pagoInfo = {
-            metodo: show === 'nequi' ? 'Nequi' : 'Davivienda',
-            monto: monto,
-            referencia: referencia,
-            servicio: servicio
-        };
-        
-        if (show === 'nequi') {
-            infoPago.innerHTML = `
-                <p><strong>💰 Monto a pagar:</strong> $${parseInt(monto).toLocaleString('es-CO')} COP</p>
-                <p><strong>🛒 Servicio:</strong> ${decodeURIComponent(servicio || 'No especificado')}</p>
-                <p><strong>📱 Cuenta Nequi:</strong> 3046101679</p>
-                <p><strong>🔑 Referencia:</strong> ${referencia}</p>
-                <hr>
-                <p><i class="fas fa-info-circle"></i> <strong>Instrucciones:</strong></p>
-                <p>1. Escanea el código QR con la app de Nequi</p>
-                <p>2. Realiza el pago por el monto indicado</p>
-                <p>3. Haz clic en "Confirmar Pago" para generar tu recibo</p>
-            `;
-            document.getElementById('nequiCard').style.display = 'block';
-            document.getElementById('daviviendaCard').style.display = 'none';
-        } else if (show === 'davivienda') {
-            infoPago.innerHTML = `
-                <p><strong>💰 Monto a pagar:</strong> $${parseInt(monto).toLocaleString('es-CO')} COP</p>
-                <p><strong>🛒 Servicio:</strong> ${decodeURIComponent(servicio || 'No especificado')}</p>
-                <p><strong>🏦 Cuenta Davivienda:</strong>  </p>
-                <p><strong>🔑 Referencia:</strong> ${referencia}</p>
-                <hr>
-                <p><i class="fas fa-info-circle"></i> <strong>Instrucciones:</strong></p>
-                <p>1. Escanea el código QR con la app de Davivienda</p>
-                <p>2. Realiza el pago por el monto indicado</p>
-                <p>3. Haz clic en "Confirmar Pago" para generar tu recibo</p>
-            `;
-            document.getElementById('nequiCard').style.display = 'none';
-            document.getElementById('daviviendaCard').style.display = 'block';
-        }
-    }
     
-    // Confirmar pago y enviar mensaje a la ventana padre
-    function confirmarPago() {
-        if (!pagoInfo.monto) {
-            alert("No hay información de pago pendiente");
-            return;
-        }
-        
-        // Enviar mensaje a la ventana padre
-        if (window.opener && !window.opener.closed) {
-            window.opener.postMessage({
-                type: 'PAGO_CONFIRMADO',
-                metodo: pagoInfo.metodo,
-                referencia: pagoInfo.referencia,
-                monto: pagoInfo.monto,
-                servicio: pagoInfo.servicio
-            }, '*');
-            
-            alert(`✅ Pago confirmado exitosamente!\n\nMétodo: ${pagoInfo.metodo}\nReferencia: ${pagoInfo.referencia}\nMonto: $${parseInt(pagoInfo.monto).toLocaleString('es-CO')} COP\n\nGenerando recibo...`);
-            
-            // Cerrar la ventana después de 1 segundo
-            setTimeout(() => {
-                window.close();
-            }, 1000);
-        } else {
-            alert(`✅ Pago confirmado!\n\nMétodo: ${pagoInfo.metodo}\nReferencia: ${pagoInfo.referencia}\nMonto: $${parseInt(pagoInfo.monto).toLocaleString('es-CO')} COP`);
-        }
-    }
-    
-    // Eventos
-    document.getElementById('confirmarPagoBtn').addEventListener('click', confirmarPago);
-    document.getElementById('cerrarVentanaBtn').addEventListener('click', () => {
-        window.close();
-    });
+  
 </script>
 
 <!-- Botón volver al inicio -->

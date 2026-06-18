@@ -322,7 +322,7 @@
 
     <!-- Recibo -->
     <div id="recibo" class="recibo">
-        <h3><i class="fas fa-receipt"></i> RECIBO DE PAGO - TechHelpCol</h3>
+        <h3><i class="fas fa-receipt"></i> RECIBO DE PAGO - InnovaTI</h3>
         <div id="reciboContent"></div>
         <button id="imprimirRecibo" style="margin-top:20px; background:#2c3e50; border:none; padding:10px 20px; color:white; border-radius:40px; cursor:pointer;">
             <i class="fas fa-print"></i> Imprimir Recibo
@@ -344,7 +344,7 @@
         { 
             id: 1, 
             nombre: "🏗️ StarMarket_System - APP Supermercado", 
-            descripcion: "Implementación de inventarios, pagos",
+            descripcion: "Implementación de inventarios de productos, gestión de proveedores, gestión de pagos, gestión de clientes, imprimir facturas",
             licenciamiento: "30 dias",
             precio: 600000,
             carpeta: "StarMarket_System"
@@ -359,7 +359,7 @@
         },
         { 
             id: 3, 
-            nombre: "🔐 QRVentas - Sistema QR de Ventas", 
+            nombre: "💳 QRVentas - Sistema QR de Ventas", 
             descripcion: "Implementación de un sistema QR de ventas para tiendas, abarrotes, supermercados",
             licenciamiento: "30 dias",
             precio: 440000,
@@ -367,10 +367,10 @@
         },
         { 
             id: 4, 
-            nombre: "🔐 SchoolNote - Sistema Base de datos Colegio", 
+            nombre: "🏫 SchoolNote - Sistema Base de datos Colegio", 
             descripcion: "Implementación de un sistema de Base de datos de Colegio, modulos de materias, profesores, estudiantes, sabana de notas",
             licenciamiento: "365 dias",
-            precio: 1500000,
+            precio: 1450000,
             carpeta: "SchoolNote"
         }
     ];
@@ -378,15 +378,20 @@
     // Lista de imágenes por proyecto
     const imagenesPorProyecto = {
         1: [
-            "StarMarket_System/imgR.png",
-            "StarMarket_System/imgSp.png",
-            "StarMarket_System/imgV.png",
-            "StarMarket_System/imgCl.png",
-            "StarMarket_System/imglnv.png",
-            "StarMarket_System/imglnv1.png",
-            "StarMarket_System/imgPed.png",
-            "StarMarket_System/imgProvee.png",
-            "StarMarket_System/imgInfo.png"
+            "StarMarket_System/S1",
+            "StarMarket_System/S2",
+            "StarMarket_System/S3",
+            "StarMarket_System/S4",
+            "StarMarket_System/S5",
+            "StarMarket_System/S6",
+            "StarMarket_System/S7",
+            "StarMarket_System/S8",
+            "StarMarket_System/S9",
+            "StarMarket_System/S10",
+            "StarMarket_System/S11",
+            "StarMarket_System/S12",
+            "StarMarket_System/S13"
+            
         ],
         2: [
             "LectorFactXML/imgLec.png",
@@ -597,10 +602,11 @@
             fecha: new Date().toLocaleString('es-CO'),
             proyecto: proyectoSeleccionado.nombre,
             descripcion: proyectoSeleccionado.descripcion,
+            licenciamiento: proyectoSeleccionado.licenciamiento,
             monto: proyectoSeleccionado.precio,
             metodo: metodoPago,
             referencia: referencia,
-            cliente: "Cliente Web - TechHelpCol"
+            cliente: "Cliente Web - InnovaTI"
         };
     }
     
@@ -611,6 +617,7 @@
             <p><strong>📅 Fecha:</strong> ${recibo.fecha}</p>
             <p><strong>🏗️ Proyecto:</strong> ${recibo.proyecto}</p>
             <p><strong>📝 Descripción:</strong> ${recibo.descripcion}</p>
+            <p><strong>📝 Licenciamiento:</strong> ${recibo.licenciamiento}</p>
             <p><strong>💰 Monto:</strong> $${recibo.monto.toLocaleString('es-CO')} COP</p>
             <p><strong>💳 Método de pago:</strong> ${recibo.metodo}</p>
             <p><strong>🔑 Referencia:</strong> ${recibo.referencia}</p>
