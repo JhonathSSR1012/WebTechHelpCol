@@ -118,6 +118,7 @@
             flex: 0 0 auto;
             cursor: pointer;
             transition: transform 0.3s;
+            position: relative;
         }
         
         .gallery-item:hover {
@@ -135,6 +136,21 @@
         
         .gallery-img:hover {
             border-color: #2ecc71;
+        }
+        
+        .gallery-img-error {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
         }
         
         /* Botones de navegación */
@@ -243,6 +259,10 @@
             border-radius: 30px;
             text-decoration: none;
             color: white;
+            transition: background 0.3s;
+        }
+        .btn-volver:hover {
+            background: #27ae60;
         }
         
         .modal-imagen {
@@ -375,7 +395,13 @@
         }
     ];
     
-    // Lista de imágenes por proyecto
+    // ========== CONFIGURACIÓN DE IMÁGENES ==========
+    // Define la ruta base donde están las imágenes
+    // Si las imágenes están en la misma carpeta que servicios.html, usa './'
+    // Si están en una carpeta 'imagenes', usa './imagenes/'
+    const RUTA_BASE_IMAGENES = './'; // Cambia esto según tu estructura
+    
+    // Lista de imágenes por proyecto con rutas completas
     const imagenesPorProyecto = {
         1: [
             "StarMarket_System/S1.png",
@@ -391,7 +417,6 @@
             "StarMarket_System/S11.png",
             "StarMarket_System/S12.png",
             "StarMarket_System/S13.png"
-            
         ],
         2: [
             "LectorFactXML/imgLec.png",
@@ -412,7 +437,7 @@
             "SchoolNote/Modulos.png",
             "SchoolNote/RegEstud.png",
             "SchoolNote/Reg2.png",
-            "SchoolNote/Estudiante",
+            "SchoolNote/Estudiante.png",
             "SchoolNote/RegProfe.png",
             "SchoolNote/Materias.png",
             "SchoolNote/Notas.png",
@@ -427,7 +452,7 @@
     function scrollGallery(direction) {
         const gallery = document.getElementById('galleryContainer');
         const scrollAmount = gallery.firstElementChild ? 
-            gallery.firstElementChild.offsetWidth + 15 : 0; // width + gap
+            gallery.firstElementChild.offsetWidth + 15 : 0;
         
         if (direction === 'next') {
             gallery.scrollBy({ left: scrollAmount, behavior: 'smooth' });
@@ -435,7 +460,6 @@
             gallery.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
         }
         
-        // Actualizar estado de los botones después del scroll
         setTimeout(updateNavButtons, 100);
     }
     
@@ -453,14 +477,12 @@
         const scrollLeft = gallery.scrollLeft;
         const maxScroll = gallery.scrollWidth - gallery.clientWidth;
         
-        // Actualizar botón anterior
         if (scrollLeft <= 10) {
             prevBtn.classList.add('disabled');
         } else {
             prevBtn.classList.remove('disabled');
         }
         
-        // Actualizar botón siguiente
         if (scrollLeft >= maxScroll - 10) {
             nextBtn.classList.add('disabled');
         } else {
@@ -472,16 +494,14 @@
         const gallery = document.getElementById('galleryContainer');
         const counter = document.getElementById('galleryCounter');
         const total = gallery.children.length;
-        const visible = Math.ceil(gallery.clientWidth / (gallery.firstElementChild?.offsetWidth + 15 || 1));
         counter.textContent = `${total} / ${total} imágenes`;
     }
     
-    // Función para cargar y mostrar las imágenes del proyecto seleccionado
+    // ========== CARGA DE IMÁGENES CON VERIFICACIÓN ==========
     function cargarImagenesProyecto(proyectoId) {
         const gallery = document.getElementById('galleryContainer');
         const imagenes = imagenesPorProyecto[proyectoId] || [];
         
-        // Limpiar galería
         gallery.innerHTML = '';
         
         if (imagenes.length === 0) {
@@ -492,23 +512,42 @@
             return;
         }
         
-        // Agregar imágenes
+        let imagenesCargadas = 0;
+        const totalImagenes = imagenes.length;
+        
         imagenes.forEach((imgUrl) => {
             const div = document.createElement('div');
             div.className = 'gallery-item';
             
             const img = document.createElement('img');
-            img.src = imgUrl;
+            // Usar la ruta base + la ruta de la imagen
+            img.src = RUTA_BASE_IMAGENES + imgUrl;
             img.className = 'gallery-img';
             img.alt = `Imagen del proyecto ${proyectoSeleccionado?.nombre || ''}`;
+            img.loading = 'lazy';
+            
+            // Manejar error de carga
             img.onerror = function() {
                 this.style.display = 'none';
-                const errorMsg = document.createElement('p');
-                errorMsg.textContent = '❌ Error al cargar imagen';
-                errorMsg.style.color = '#e74c3c';
-                errorMsg.style.fontSize = '12px';
-                this.parentNode.appendChild(errorMsg);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'gallery-img-error';
+                errorDiv.innerHTML = `
+                    <div>
+                        <i class="fas fa-image" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
+                        <span>Error al cargar</span>
+                        <span style="display: block; font-size: 11px; color: #999; margin-top: 4px;">${imgUrl}</span>
+                    </div>
+                `;
+                this.parentNode.appendChild(errorDiv);
+                imagenesCargadas++;
+                verificarCargaCompleta();
             };
+            
+            img.onload = function() {
+                imagenesCargadas++;
+                verificarCargaCompleta();
+            };
+            
             img.onclick = function() {
                 abrirModal(this.src);
             };
@@ -517,14 +556,23 @@
             gallery.appendChild(div);
         });
         
-        // Actualizar contador y botones
+        function verificarCargaCompleta() {
+            if (imagenesCargadas === totalImagenes) {
+                setTimeout(() => {
+                    updateCounter();
+                    updateNavButtons();
+                }, 100);
+            }
+        }
+        
+        // Actualizar después de un tiempo por si algunas imágenes no disparan eventos
         setTimeout(() => {
             updateCounter();
             updateNavButtons();
-        }, 100);
+        }, 2000);
     }
     
-    // Funciones para el modal de imágenes
+    // ========== FUNCIONES PARA EL MODAL ==========
     function abrirModal(src) {
         const modal = document.getElementById('modalImagen');
         const imgAmpliada = document.getElementById('imagenAmpliada');
@@ -538,7 +586,6 @@
         document.body.style.overflow = 'auto';
     }
     
-    // Cerrar modal con tecla ESC
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             cerrarModal();
@@ -584,7 +631,6 @@
                 renderizarProyectos();
                 cargarImagenesProyecto(proy.id);
                 
-                // Resetear el scroll de la galería al inicio
                 const gallery = document.getElementById('galleryContainer');
                 gallery.scrollLeft = 0;
                 updateNavButtons();
@@ -628,7 +674,6 @@
         `;
         document.getElementById('recibo').classList.add('visible');
         
-        // Guardar en historial
         const historial = JSON.parse(localStorage.getItem('historialCompras') || '[]');
         historial.unshift(recibo);
         localStorage.setItem('historialCompras', JSON.stringify(historial.slice(0, 20)));
@@ -651,10 +696,8 @@
         const monto = proyectoSeleccionado.precio;
         const servicio = proyectoSeleccionado.nombre;
         
-        // Abrir ventana con QR de pago
         const urlPago = `pagos.html?show=${metodo === 'NEQUI' ? 'nequi' : 'davivienda'}&monto=${monto}&servicio=${encodeURIComponent(servicio)}`;
         
-        // Abrir ventana de pago
         const ventanaPago = window.open(urlPago, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
         
         if (!ventanaPago) {
@@ -662,7 +705,6 @@
             return;
         }
         
-        // Esperar a que el usuario confirme el pago en la ventana emergente
         function recibirConfirmacion(event) {
             if (event.data && event.data.type === 'PAGO_CONFIRMADO') {
                 window.removeEventListener('message', recibirConfirmacion);
@@ -670,11 +712,9 @@
                 
                 mostrarAlerta('recibo', `✅ Pago confirmado!`, 'success');
                 
-                // Generar y mostrar recibo
                 const recibo = generarRecibo(metodoNombre, event.data.referencia || referencia);
                 mostrarRecibo(recibo);
                 
-                // Cerrar la ventana de pago si aún está abierta
                 if (ventanaPago && !ventanaPago.closed) {
                     ventanaPago.close();
                 }
@@ -725,12 +765,10 @@
         }
     });
     
-    // Actualizar botones al hacer scroll manual
     document.getElementById('galleryContainer').addEventListener('scroll', function() {
         updateNavButtons();
     });
     
-    // Actualizar al redimensionar la ventana
     window.addEventListener('resize', function() {
         updateNavButtons();
         updateCounter();
