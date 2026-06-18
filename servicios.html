@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechHelpCol - Servicios</title>
+    <title>InnovaTI - Servicios</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,6 +51,15 @@
             color: #0a2b3e;
             margin: 10px 0;
         }
+        .product-licencia {
+            font-size: 13px;
+            color: #666;
+            margin: 5px 0 10px 0;
+        }
+        .product-licencia i {
+            color: #2ecc71;
+            margin-right: 5px;
+        }
         .product-status {
             margin-top: 10px;
             font-size: 12px;
@@ -67,6 +76,7 @@
         .badge-success { background: #2ecc71; color: white; }
         .badge-danger { background: #e74c3c; color: white; }
         .badge-info { background: #3498db; color: white; }
+        .badge-licencia { background: #f39c12; color: white; }
         
         .proyecto-gallery {
             background: #f8f9fa;
@@ -308,7 +318,7 @@
 <body>
 <div class="container">
     <h1><i class="fas fa-cogs"></i> Módulo de Servicios</h1>
-    <div class="sub">Selecciona un proyecto y realiza el pago para generar tu recibo</div>
+    <div class="sub">Selecciona un proyecto y realiza el pago para envio del recibo al correo de contacto</div>
 
     <!-- Lista de proyectos -->
     <div class="product-list" id="productList"></div>
@@ -396,12 +406,8 @@
     ];
     
     // ========== CONFIGURACIÓN DE IMÁGENES ==========
-    // Define la ruta base donde están las imágenes
-    // Si las imágenes están en la misma carpeta que servicios.html, usa './'
-    // Si están en una carpeta 'imagenes', usa './imagenes/'
-    const RUTA_BASE_IMAGENES = './'; // Cambia esto según tu estructura
+    const RUTA_BASE_IMAGENES = './';
     
-    // Lista de imágenes por proyecto con rutas completas
     const imagenesPorProyecto = {
         1: [
             "StarMarket_System/S1.png",
@@ -520,13 +526,11 @@
             div.className = 'gallery-item';
             
             const img = document.createElement('img');
-            // Usar la ruta base + la ruta de la imagen
             img.src = RUTA_BASE_IMAGENES + imgUrl;
             img.className = 'gallery-img';
             img.alt = `Imagen del proyecto ${proyectoSeleccionado?.nombre || ''}`;
             img.loading = 'lazy';
             
-            // Manejar error de carga
             img.onerror = function() {
                 this.style.display = 'none';
                 const errorDiv = document.createElement('div');
@@ -565,7 +569,6 @@
             }
         }
         
-        // Actualizar después de un tiempo por si algunas imágenes no disparan eventos
         setTimeout(() => {
             updateCounter();
             updateNavButtons();
@@ -613,12 +616,32 @@
             const div = document.createElement('div');
             div.className = `product-item ${proyectoSeleccionado?.id === proy.id ? 'selected' : ''}`;
             div.dataset.id = proy.id;
+            
+            // Determinar el emoji según el tipo de licenciamiento
+            let licenciaIcon = '📅';
+            let licenciaColor = '#f39c12';
+            if (proy.licenciamiento.includes('365')) {
+                licenciaIcon = '📆';
+                licenciaColor = '#2ecc71';
+            } else if (proy.licenciamiento.includes('180')) {
+                licenciaIcon = '📋';
+                licenciaColor = '#3498db';
+            } else if (proy.licenciamiento.includes('30')) {
+                licenciaIcon = '📅';
+                licenciaColor = '#f39c12';
+            }
+            
             div.innerHTML = `
                 <div style="font-size:18px; font-weight:bold;">${proy.nombre}</div>
                 <div class="product-price">$${proy.precio.toLocaleString('es-CO')} COP</div>
+                <div class="product-licencia">
+                    <i class="fas fa-clock" style="color: ${licenciaColor};"></i>
+                    Licenciamiento: <strong>${proy.licenciamiento}</strong>
+                </div>
                 <div style="font-size:13px; color:#666; margin:10px 0;">${proy.descripcion}</div>
                 <div class="product-status">
                     <span class="status-badge badge-info">💳 Pago con QR</span>
+                    <span class="status-badge badge-licencia">${licenciaIcon} ${proy.licenciamiento}</span>
                 </div>
                 ${proyectoSeleccionado?.id === proy.id ? '<i class="fas fa-check-circle" style="color:#2ecc71; margin-top:10px; font-size:20px;"></i>' : ''}
             `;
@@ -663,7 +686,7 @@
             <p><strong>📅 Fecha:</strong> ${recibo.fecha}</p>
             <p><strong>🏗️ Proyecto:</strong> ${recibo.proyecto}</p>
             <p><strong>📝 Descripción:</strong> ${recibo.descripcion}</p>
-            <p><strong>📝 Licenciamiento:</strong> ${recibo.licenciamiento}</p>
+            <p><strong>⏱️ Licenciamiento:</strong> ${recibo.licenciamiento}</p>
             <p><strong>💰 Monto:</strong> $${recibo.monto.toLocaleString('es-CO')} COP</p>
             <p><strong>💳 Método de pago:</strong> ${recibo.metodo}</p>
             <p><strong>🔑 Referencia:</strong> ${recibo.referencia}</p>
@@ -734,7 +757,7 @@
         ventana.document.write(`
             <html>
             <head>
-                <title>Recibo TechHelpCol</title>
+                <title>Recibo InnovaTI</title>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
                 <style>
                     body { font-family: 'Segoe UI', sans-serif; padding: 40px; }
