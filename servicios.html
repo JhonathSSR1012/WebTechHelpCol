@@ -706,6 +706,7 @@
                 
                 // Intentar mostrar miniatura
                 video.onloadedmetadata = function() {
+                    // Intentar obtener un frame para miniatura
                     this.currentTime = Math.min(1, this.duration / 2);
                 };
                 
