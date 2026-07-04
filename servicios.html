@@ -77,6 +77,7 @@
         .badge-danger { background: #e74c3c; color: white; }
         .badge-info { background: #3498db; color: white; }
         .badge-licencia { background: #f39c12; color: white; }
+        .badge-video { background: #9C27B0; color: white; }
         
         .proyecto-gallery {
             background: #f8f9fa;
@@ -163,6 +164,47 @@
             padding: 10px;
         }
         
+        /* Estilos para videos en la galería */
+        .gallery-video {
+            width: 200px;
+            height: 200px;
+            border-radius: 12px;
+            border: 2px solid #ddd;
+            object-fit: cover;
+            background: #000;
+        }
+        
+        .gallery-video:hover {
+            border-color: #9C27B0;
+        }
+        
+        .gallery-video-wrapper {
+            position: relative;
+        }
+        
+        .gallery-video-wrapper .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: white;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+        
+        .gallery-video-wrapper:hover .play-icon {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: rgba(156, 39, 176, 0.8);
+        }
+        
         /* Botones de navegación */
         .gallery-nav {
             position: absolute;
@@ -213,6 +255,62 @@
             color: #666;
             font-size: 14px;
             margin-top: 10px;
+        }
+        
+        /* Reproductor de video modal */
+        .modal-video {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            cursor: pointer;
+        }
+        
+        .modal-video-content {
+            position: relative;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+        }
+        
+        .modal-video-content video {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 12px;
+            background: #000;
+        }
+        
+        .modal-video .cerrar-modal {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s;
+        }
+        
+        .modal-video .cerrar-modal:hover {
+            color: #9C27B0;
+            transform: scale(1.2);
+        }
+        
+        .modal-video .video-title {
+            color: white;
+            font-size: 18px;
+            margin-top: 15px;
+            text-align: center;
+            max-width: 90%;
         }
         
         .payment-buttons {
@@ -303,14 +401,49 @@
             cursor: pointer;
         }
         
+        /* Botón para subir video */
+        .btn-subir-video {
+            background: #9C27B0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 0;
+        }
+        
+        .btn-subir-video:hover {
+            background: #7B1FA2;
+            transform: scale(1.05);
+        }
+        
+        .upload-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 12px;
+        }
+        
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 20px; }
             .gallery-img { width: 150px; height: 150px; }
+            .gallery-video { width: 150px; height: 150px; }
             .gallery-nav {
                 width: 40px;
                 height: 40px;
                 font-size: 18px;
+            }
+            .modal-video-content video {
+                max-width: 100%;
+                max-height: 60vh;
             }
         }
     </style>
@@ -323,11 +456,22 @@
     <!-- Lista de proyectos -->
     <div class="product-list" id="productList"></div>
 
-    <!-- Galería de imágenes del proyecto seleccionado -->
+    <!-- Galería de imágenes y videos del proyecto seleccionado -->
     <div class="proyecto-gallery" id="galeriaProyecto">
         <div class="gallery-title">
-            <i class="fas fa-folder-open"></i> Imágenes del Proyecto Seleccionado
+            <i class="fas fa-folder-open"></i> Imágenes y Videos del Proyecto Seleccionado
         </div>
+        
+        <!-- Sección para subir video -->
+        <div class="upload-section">
+            <button class="btn-subir-video" onclick="subirVideo()">
+                <i class="fas fa-video"></i> Subir Video
+            </button>
+            <span style="font-size: 12px; color: #666;">
+                <i class="fas fa-info-circle"></i> Formatos soportados: MP4, WebM, OGG, AVI, MOV
+            </span>
+        </div>
+        
         <div class="gallery-wrapper">
             <button class="gallery-nav gallery-nav-prev" id="galleryPrev" aria-label="Anterior">
                 <i class="fas fa-chevron-left"></i>
@@ -337,7 +481,7 @@
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
-        <div class="gallery-counter" id="galleryCounter">0 / 0 imágenes</div>
+        <div class="gallery-counter" id="galleryCounter">0 / 0 elementos</div>
     </div>
 
     <!-- Botones de pago -->
@@ -366,6 +510,18 @@
 <div id="modalImagen" class="modal-imagen" onclick="cerrarModal()">
     <span class="cerrar-modal">&times;</span>
     <img id="imagenAmpliada" src="">
+</div>
+
+<!-- Modal para reproducir video -->
+<div id="modalVideo" class="modal-video" onclick="cerrarModalVideo()">
+    <span class="cerrar-modal">&times;</span>
+    <div class="modal-video-content" onclick="event.stopPropagation()">
+        <video id="videoReproductor" controls autoplay>
+            <source id="videoSource" src="" type="video/mp4">
+            Tu navegador no soporta la reproducción de videos.
+        </video>
+        <div class="video-title" id="videoTitle"></div>
+    </div>
 </div>
 
 <script>
@@ -405,55 +561,80 @@
         }
     ];
     
-    // ========== CONFIGURACIÓN DE IMÁGENES ==========
-    const RUTA_BASE_IMAGENES = './';
+    // ========== CONFIGURACIÓN DE IMÁGENES Y VIDEOS ==========
+    const RUTA_BASE = './';
     
-    const imagenesPorProyecto = {
-        1: [
-            "StarMarket_System/S1.png",
-            "StarMarket_System/S2.png",
-            "StarMarket_System/S3.png",
-            "StarMarket_System/S4.png",
-            "StarMarket_System/S5.png",
-            "StarMarket_System/S6.png",
-            "StarMarket_System/S7.png",
-            "StarMarket_System/S8.png",
-            "StarMarket_System/S9.png",
-            "StarMarket_System/S10.png",
-            "StarMarket_System/S11.png",
-            "StarMarket_System/S12.png",
-            "StarMarket_System/S13.png"
-        ],
-        2: [
-            "LectorFactXML/L1.png",
-            "LectorFactXML/L2.png",
-            "LectorFactXML/L3.png",
-            "LectorFactXML/L4.png",
-            "LectorFactXML/L5.png",
-            "LectorFactXML/L6.png",
-            "LectorFactXML/L7.png",
-            "LectorFactXML/L8.png"
-
-        ],
-        3: [
-            "QRVentas/imgQr.png",
-            "QRVentas/imgQr2.png",
-            "QRVentas/imgQr3.png",
-            "QRVentas/imgQr4.png",
-            "QRVentas/imgQr5.png"
-        ],
-        4: [
-            "SchoolNote/Registro.png",
-            "SchoolNote/Licencia.png",
-            "SchoolNote/Modulos.png",
-            "SchoolNote/RegEstud.png",
-            "SchoolNote/Reg2.png",
-            "SchoolNote/Estudiante.png",
-            "SchoolNote/RegProfe.png",
-            "SchoolNote/Materias.png",
-            "SchoolNote/Notas.png",
-            "SchoolNote/Sabana.png"
-        ]
+    // Lista de archivos multimedia por proyecto (imágenes y videos)
+    const archivosPorProyecto = {
+        1: {
+            imagenes: [
+                "StarMarket_System/S1.png",
+                "StarMarket_System/S2.png",
+                "StarMarket_System/S3.png",
+                "StarMarket_System/S4.png",
+                "StarMarket_System/S5.png",
+                "StarMarket_System/S6.png",
+                "StarMarket_System/S7.png",
+                "StarMarket_System/S8.png",
+                "StarMarket_System/S9.png",
+                "StarMarket_System/S10.png",
+                "StarMarket_System/S11.png",
+                "StarMarket_System/S12.png",
+                "StarMarket_System/S13.png"
+            ],
+            videos: [
+                // Agrega aquí los videos de StarMarket_System
+                // "StarMarket_System/demo.mp4",
+                // "StarMarket_System/tutorial.webm"
+            ]
+        },
+        2: {
+            imagenes: [
+                "LectorFactXML/L1.png",
+                "LectorFactXML/L2.png",
+                "LectorFactXML/L3.png",
+                "LectorFactXML/L4.png",
+                "LectorFactXML/L5.png",
+                "LectorFactXML/L6.png",
+                "LectorFactXML/L7.png",
+                "LectorFactXML/L8.png"
+            ],
+            videos: [
+                // Agrega aquí los videos de LectorFactXML
+                // "LectorFactXML/demo.mp4"
+            ]
+        },
+        3: {
+            imagenes: [
+                "QRVentas/imgQr.png",
+                "QRVentas/imgQr2.png",
+                "QRVentas/imgQr3.png",
+                "QRVentas/imgQr4.png",
+                "QRVentas/imgQr5.png"
+            ],
+            videos: [
+                // Agrega aquí los videos de QRVentas
+                // "QRVentas/demo.mp4"
+            ]
+        },
+        4: {
+            imagenes: [
+                "SchoolNote/Registro.png",
+                "SchoolNote/Licencia.png",
+                "SchoolNote/Modulos.png",
+                "SchoolNote/RegEstud.png",
+                "SchoolNote/Reg2.png",
+                "SchoolNote/Estudiante.png",
+                "SchoolNote/RegProfe.png",
+                "SchoolNote/Materias.png",
+                "SchoolNote/Notas.png",
+                "SchoolNote/Sabana.png"
+            ],
+            videos: [
+                
+                "Schoolnote.mp4"
+            ]
+        }
     };
     
     let proyectoSeleccionado = null;
@@ -505,68 +686,142 @@
         const gallery = document.getElementById('galleryContainer');
         const counter = document.getElementById('galleryCounter');
         const total = gallery.children.length;
-        counter.textContent = `${total} / ${total} imágenes`;
+        counter.textContent = `${total} / ${total} elementos`;
     }
     
-    // ========== CARGA DE IMÁGENES CON VERIFICACIÓN ==========
-    function cargarImagenesProyecto(proyectoId) {
+    // ========== CARGA DE ARCHIVOS MULTIMEDIA ==========
+    function cargarArchivosProyecto(proyectoId) {
         const gallery = document.getElementById('galleryContainer');
-        const imagenes = imagenesPorProyecto[proyectoId] || [];
+        const archivos = archivosPorProyecto[proyectoId] || { imagenes: [], videos: [] };
         
         gallery.innerHTML = '';
         
-        if (imagenes.length === 0) {
-            gallery.innerHTML = '<p style="color:#999; text-align:center; width:100%; padding:20px;">📷 No hay imágenes disponibles para este proyecto.</p>';
-            document.getElementById('galleryCounter').textContent = '0 / 0 imágenes';
+        // Crear lista combinada de todos los archivos (imágenes y videos)
+        let todosLosArchivos = [];
+        
+        // Agregar imágenes
+        archivos.imagenes.forEach(ruta => {
+            todosLosArchivos.push({ tipo: 'imagen', ruta: ruta });
+        });
+        
+        // Agregar videos
+        archivos.videos.forEach(ruta => {
+            todosLosArchivos.push({ tipo: 'video', ruta: ruta });
+        });
+        
+        if (todosLosArchivos.length === 0) {
+            gallery.innerHTML = '<p style="color:#999; text-align:center; width:100%; padding:20px;">📷 No hay archivos multimedia disponibles para este proyecto.</p>';
+            document.getElementById('galleryCounter').textContent = '0 / 0 elementos';
             document.getElementById('galleryPrev').classList.add('disabled');
             document.getElementById('galleryNext').classList.add('disabled');
             return;
         }
         
-        let imagenesCargadas = 0;
-        const totalImagenes = imagenes.length;
+        let archivosCargados = 0;
+        const totalArchivos = todosLosArchivos.length;
         
-        imagenes.forEach((imgUrl) => {
+        todosLosArchivos.forEach((archivo, index) => {
             const div = document.createElement('div');
             div.className = 'gallery-item';
             
-            const img = document.createElement('img');
-            img.src = RUTA_BASE_IMAGENES + imgUrl;
-            img.className = 'gallery-img';
-            img.alt = `Imagen del proyecto ${proyectoSeleccionado?.nombre || ''}`;
-            img.loading = 'lazy';
+            if (archivo.tipo === 'imagen') {
+                // Crear elemento de imagen
+                const img = document.createElement('img');
+                img.src = RUTA_BASE + archivo.ruta;
+                img.className = 'gallery-img';
+                img.alt = `Imagen del proyecto ${proyectoSeleccionado?.nombre || ''}`;
+                img.loading = 'lazy';
+                img.dataset.index = index;
+                
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'gallery-img-error';
+                    errorDiv.innerHTML = `
+                        <div>
+                            <i class="fas fa-image" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
+                            <span>Error al cargar</span>
+                            <span style="display: block; font-size: 11px; color: #999; margin-top: 4px;">${archivo.ruta}</span>
+                        </div>
+                    `;
+                    this.parentNode.appendChild(errorDiv);
+                    archivosCargados++;
+                    verificarCargaCompleta();
+                };
+                
+                img.onload = function() {
+                    archivosCargados++;
+                    verificarCargaCompleta();
+                };
+                
+                img.onclick = function() {
+                    abrirModal(this.src);
+                };
+                
+                div.appendChild(img);
+            } else if (archivo.tipo === 'video') {
+                // Crear elemento de video con miniatura
+                const wrapper = document.createElement('div');
+                wrapper.className = 'gallery-video-wrapper';
+                
+                const video = document.createElement('video');
+                video.src = RUTA_BASE + archivo.ruta;
+                video.className = 'gallery-video';
+                video.muted = true;
+                video.preload = 'metadata';
+                video.dataset.index = index;
+                
+                // Intentar cargar miniatura
+                video.onloadedmetadata = function() {
+                    this.currentTime = 1; // Intentar ir al segundo 1 para miniatura
+                };
+                
+                video.onseeked = function() {
+                    // Cuando se busca, se muestra la miniatura
+                    archivosCargados++;
+                    verificarCargaCompleta();
+                };
+                
+                video.onerror = function() {
+                    this.style.display = 'none';
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'gallery-img-error';
+                    errorDiv.innerHTML = `
+                        <div>
+                            <i class="fas fa-video" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
+                            <span>Error al cargar video</span>
+                            <span style="display: block; font-size: 11px; color: #999; margin-top: 4px;">${archivo.ruta}</span>
+                        </div>
+                    `;
+                    wrapper.appendChild(errorDiv);
+                    archivosCargados++;
+                    verificarCargaCompleta();
+                };
+                
+                // Icono de play superpuesto
+                const playIcon = document.createElement('div');
+                playIcon.className = 'play-icon';
+                playIcon.innerHTML = '<i class="fas fa-play"></i>';
+                
+                wrapper.appendChild(video);
+                wrapper.appendChild(playIcon);
+                div.appendChild(wrapper);
+                
+                // Click para reproducir video en modal
+                div.onclick = function(e) {
+                    e.stopPropagation();
+                    const videoElement = this.querySelector('video');
+                    if (videoElement) {
+                        reproducirVideo(videoElement.src, archivo.ruta);
+                    }
+                };
+            }
             
-            img.onerror = function() {
-                this.style.display = 'none';
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'gallery-img-error';
-                errorDiv.innerHTML = `
-                    <div>
-                        <i class="fas fa-image" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
-                        <span>Error al cargar</span>
-                        <span style="display: block; font-size: 11px; color: #999; margin-top: 4px;">${imgUrl}</span>
-                    </div>
-                `;
-                this.parentNode.appendChild(errorDiv);
-                imagenesCargadas++;
-                verificarCargaCompleta();
-            };
-            
-            img.onload = function() {
-                imagenesCargadas++;
-                verificarCargaCompleta();
-            };
-            
-            img.onclick = function() {
-                abrirModal(this.src);
-            };
-            
-            div.appendChild(img);
             gallery.appendChild(div);
         });
         
         function verificarCargaCompleta() {
-            if (imagenesCargadas === totalImagenes) {
+            if (archivosCargados === totalArchivos) {
                 setTimeout(() => {
                     updateCounter();
                     updateNavButtons();
@@ -577,10 +832,100 @@
         setTimeout(() => {
             updateCounter();
             updateNavButtons();
-        }, 2000);
+        }, 3000);
     }
     
-    // ========== FUNCIONES PARA EL MODAL ==========
+    // ========== FUNCIONES PARA SUBIR VIDEO ==========
+    function subirVideo() {
+        if (!proyectoSeleccionado) {
+            alert("⚠️ Por favor, selecciona un proyecto primero");
+            return;
+        }
+        
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'video/*';
+        input.multiple = false;
+        
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validar tipo de archivo
+                const tiposPermitidos = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'];
+                if (!tiposPermitidos.includes(file.type)) {
+                    alert('⚠️ Formato de video no soportado. Usa: MP4, WebM, OGG, MOV o AVI');
+                    return;
+                }
+                
+                // Validar tamaño (máximo 100MB)
+                if (file.size > 100 * 1024 * 1024) {
+                    alert('⚠️ El video es demasiado grande (máximo 100MB)');
+                    return;
+                }
+                
+                // Crear URL para el video
+                const videoURL = URL.createObjectURL(file);
+                
+                // Agregar a la lista de archivos del proyecto
+                if (!archivosPorProyecto[proyectoSeleccionado.id]) {
+                    archivosPorProyecto[proyectoSeleccionado.id] = { imagenes: [], videos: [] };
+                }
+                
+                if (!archivosPorProyecto[proyectoSeleccionado.id].videos) {
+                    archivosPorProyecto[proyectoSeleccionado.id].videos = [];
+                }
+                
+                // Guardar nombre del video (simulado)
+                const nombreVideo = `video_subido_${Date.now()}.${file.name.split('.').pop()}`;
+                const rutaVideo = `${proyectoSeleccionado.carpeta}/${nombreVideo}`;
+                
+                // En un entorno real, aquí se subiría al servidor
+                // Por ahora, lo guardamos en memoria
+                archivosPorProyecto[proyectoSeleccionado.id].videos.push(rutaVideo);
+                
+                // Guardar referencia para reproducción
+                if (!window.videosTemp) window.videosTemp = {};
+                window.videosTemp[rutaVideo] = videoURL;
+                
+                // Recargar la galería
+                cargarArchivosProyecto(proyectoSeleccionado.id);
+                
+                alert(`✅ Video "${file.name}" subido correctamente`);
+            }
+        };
+        
+        input.click();
+    }
+    
+    // ========== FUNCIONES PARA EL MODAL DE VIDEO ==========
+    function reproducirVideo(src, nombre) {
+        const modal = document.getElementById('modalVideo');
+        const video = document.getElementById('videoReproductor');
+        const source = document.getElementById('videoSource');
+        const title = document.getElementById('videoTitle');
+        
+        // Usar la URL temporal si existe
+        if (window.videosTemp && window.videosTemp[nombre]) {
+            source.src = window.videosTemp[nombre];
+        } else {
+            source.src = src;
+        }
+        
+        title.textContent = `🎬 ${nombre}`;
+        video.load();
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function cerrarModalVideo() {
+        const modal = document.getElementById('modalVideo');
+        const video = document.getElementById('videoReproductor');
+        video.pause();
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    // ========== FUNCIONES PARA EL MODAL DE IMAGEN ==========
     function abrirModal(src) {
         const modal = document.getElementById('modalImagen');
         const imgAmpliada = document.getElementById('imagenAmpliada');
@@ -594,14 +939,18 @@
         document.body.style.overflow = 'auto';
     }
     
+    // Cerrar modal de video con ESC
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             cerrarModal();
+            cerrarModalVideo();
         }
     });
     
     window.abrirModal = abrirModal;
     window.cerrarModal = cerrarModal;
+    window.cerrarModalVideo = cerrarModalVideo;
+    window.subirVideo = subirVideo;
     
     function mostrarAlerta(elementId, mensaje, tipo) {
         const alert = document.getElementById(elementId);
@@ -622,7 +971,6 @@
             div.className = `product-item ${proyectoSeleccionado?.id === proy.id ? 'selected' : ''}`;
             div.dataset.id = proy.id;
             
-            // Determinar el emoji según el tipo de licenciamiento
             let licenciaIcon = '📅';
             let licenciaColor = '#f39c12';
             if (proy.licenciamiento.includes('365')) {
@@ -636,6 +984,10 @@
                 licenciaColor = '#f39c12';
             }
             
+            // Contar videos disponibles
+            const tieneVideos = archivosPorProyecto[proy.id]?.videos?.length > 0;
+            const badgeVideo = tieneVideos ? `<span class="status-badge badge-video">🎬 ${archivosPorProyecto[proy.id].videos.length} videos</span>` : '';
+            
             div.innerHTML = `
                 <div style="font-size:18px; font-weight:bold;">${proy.nombre}</div>
                 <div class="product-price">$${proy.precio.toLocaleString('es-CO')} COP</div>
@@ -647,6 +999,7 @@
                 <div class="product-status">
                     <span class="status-badge badge-info">💳 Pago con QR</span>
                     <span class="status-badge badge-licencia">${licenciaIcon} ${proy.licenciamiento}</span>
+                    ${badgeVideo}
                 </div>
                 ${proyectoSeleccionado?.id === proy.id ? '<i class="fas fa-check-circle" style="color:#2ecc71; margin-top:10px; font-size:20px;"></i>' : ''}
             `;
@@ -657,7 +1010,7 @@
                 }
                 proyectoSeleccionado = proy;
                 renderizarProyectos();
-                cargarImagenesProyecto(proy.id);
+                cargarArchivosProyecto(proy.id);
                 
                 const gallery = document.getElementById('galleryContainer');
                 gallery.scrollLeft = 0;
@@ -807,7 +1160,7 @@
     if (proyectos.length > 0) {
         proyectoSeleccionado = proyectos[0];
         renderizarProyectos();
-        cargarImagenesProyecto(proyectoSeleccionado.id);
+        cargarArchivosProyecto(proyectoSeleccionado.id);
     }
 </script>
 </body>
