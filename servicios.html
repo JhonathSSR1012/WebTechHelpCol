@@ -298,18 +298,7 @@
             transition: all 0.3s;
         }
         
-        .modal-video .cerrar-modal:hover {
-            color: #9C27B0;
-            transform: scale(1.2);
-        }
-        
-        .modal-video .video-title {
-            color: white;
-            font-size: 18px;
-            margin-top: 15px;
-            text-align: center;
-            max-width: 90%;
-        }
+    
         
         .payment-buttons {
             display: flex;
@@ -693,13 +682,6 @@
                     verificarCargaCompleta();
                 };
                 
-                const playIcon = document.createElement('div');
-                playIcon.className = 'play-icon';
-                playIcon.innerHTML = '<i class="fas fa-play"></i>';
-                
-                const durationLabel = document.createElement('div');
-                durationLabel.className = 'video-duration';
-                durationLabel.textContent = '▶';
                 
                 video.onloadeddata = function() {
                     if (this.duration) {
