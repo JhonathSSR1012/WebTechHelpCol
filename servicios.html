@@ -205,6 +205,18 @@
             background: rgba(156, 39, 176, 0.8);
         }
         
+        .gallery-video-wrapper .video-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            pointer-events: none;
+        }
+        
         /* Botones de navegación */
         .gallery-nav {
             position: absolute;
@@ -249,7 +261,7 @@
             pointer-events: none;
         }
         
-        /* Contador de imágenes */
+        /* Contador */
         .gallery-counter {
             text-align: center;
             color: #666;
@@ -561,10 +573,11 @@
         }
     ];
     
-    // ========== CONFIGURACIÓN DE IMÁGENES Y VIDEOS ==========
+    // ========== CONFIGURACIÓN DE ARCHIVOS POR PROYECTO ==========
     const RUTA_BASE = './';
     
-    // Lista de archivos multimedia por proyecto (imágenes y videos)
+    // Lista de archivos multimedia por proyecto
+    // Los videos están en la misma carpeta que las imágenes
     const archivosPorProyecto = {
         1: {
             imagenes: [
@@ -584,7 +597,7 @@
             ],
             videos: [
                 // Agrega aquí los videos de StarMarket_System
-                // "StarMarket_System/demo.mp4",
+                // "StarMarket_System/video_demo.mp4",
                 // "StarMarket_System/tutorial.webm"
             ]
         },
@@ -601,7 +614,7 @@
             ],
             videos: [
                 // Agrega aquí los videos de LectorFactXML
-                // "LectorFactXML/demo.mp4"
+                // "LectorFactXML/video_demo.mp4"
             ]
         },
         3: {
@@ -614,7 +627,7 @@
             ],
             videos: [
                 // Agrega aquí los videos de QRVentas
-                // "QRVentas/demo.mp4"
+                // "QRVentas/video_demo.mp4"
             ]
         },
         4: {
@@ -631,8 +644,8 @@
                 "SchoolNote/Sabana.png"
             ],
             videos: [
-                
-                "Schoolnote.mp4"
+                // Agrega aquí los videos de SchoolNote
+                // "SchoolNote/video_demo.mp4"
             ]
         }
     };
@@ -701,12 +714,12 @@
         
         // Agregar imágenes
         archivos.imagenes.forEach(ruta => {
-            todosLosArchivos.push({ tipo: 'imagen', ruta: ruta });
+            todosLosArchivos.push({ tipo: 'imagen', ruta: ruta, extension: ruta.split('.').pop() });
         });
         
-        // Agregar videos
+        // Agregar videos (están en la misma carpeta)
         archivos.videos.forEach(ruta => {
-            todosLosArchivos.push({ tipo: 'video', ruta: ruta });
+            todosLosArchivos.push({ tipo: 'video', ruta: ruta, extension: ruta.split('.').pop() });
         });
         
         if (todosLosArchivos.length === 0) {
@@ -723,6 +736,7 @@
         todosLosArchivos.forEach((archivo, index) => {
             const div = document.createElement('div');
             div.className = 'gallery-item';
+            div.dataset.index = index;
             
             if (archivo.tipo === 'imagen') {
                 // Crear elemento de imagen
@@ -731,7 +745,6 @@
                 img.className = 'gallery-img';
                 img.alt = `Imagen del proyecto ${proyectoSeleccionado?.nombre || ''}`;
                 img.loading = 'lazy';
-                img.dataset.index = index;
                 
                 img.onerror = function() {
                     this.style.display = 'none';
@@ -754,13 +767,14 @@
                     verificarCargaCompleta();
                 };
                 
-                img.onclick = function() {
+                img.onclick = function(e) {
+                    e.stopPropagation();
                     abrirModal(this.src);
                 };
                 
                 div.appendChild(img);
             } else if (archivo.tipo === 'video') {
-                // Crear elemento de video con miniatura
+                // Crear elemento de video
                 const wrapper = document.createElement('div');
                 wrapper.className = 'gallery-video-wrapper';
                 
@@ -769,15 +783,14 @@
                 video.className = 'gallery-video';
                 video.muted = true;
                 video.preload = 'metadata';
-                video.dataset.index = index;
                 
-                // Intentar cargar miniatura
+                // Intentar mostrar miniatura
                 video.onloadedmetadata = function() {
-                    this.currentTime = 1; // Intentar ir al segundo 1 para miniatura
+                    // Intentar obtener un frame para miniatura
+                    this.currentTime = Math.min(1, this.duration / 2);
                 };
                 
                 video.onseeked = function() {
-                    // Cuando se busca, se muestra la miniatura
                     archivosCargados++;
                     verificarCargaCompleta();
                 };
@@ -803,8 +816,22 @@
                 playIcon.className = 'play-icon';
                 playIcon.innerHTML = '<i class="fas fa-play"></i>';
                 
+                // Mostrar duración del video
+                const durationLabel = document.createElement('div');
+                durationLabel.className = 'video-duration';
+                durationLabel.textContent = '▶';
+                
+                video.onloadeddata = function() {
+                    if (this.duration) {
+                        const mins = Math.floor(this.duration / 60);
+                        const segs = Math.floor(this.duration % 60);
+                        durationLabel.textContent = `${mins}:${segs.toString().padStart(2, '0')}`;
+                    }
+                };
+                
                 wrapper.appendChild(video);
                 wrapper.appendChild(playIcon);
+                wrapper.appendChild(durationLabel);
                 div.appendChild(wrapper);
                 
                 // Click para reproducir video en modal
@@ -829,6 +856,7 @@
             }
         }
         
+        // Timeout por si algunas cargas fallan silenciosamente
         setTimeout(() => {
             updateCounter();
             updateNavButtons();
@@ -866,6 +894,10 @@
                 // Crear URL para el video
                 const videoURL = URL.createObjectURL(file);
                 
+                // Obtener el nombre del archivo
+                const nombreVideo = file.name;
+                const rutaVideo = `${proyectoSeleccionado.carpeta}/${nombreVideo}`;
+                
                 // Agregar a la lista de archivos del proyecto
                 if (!archivosPorProyecto[proyectoSeleccionado.id]) {
                     archivosPorProyecto[proyectoSeleccionado.id] = { imagenes: [], videos: [] };
@@ -875,17 +907,12 @@
                     archivosPorProyecto[proyectoSeleccionado.id].videos = [];
                 }
                 
-                // Guardar nombre del video (simulado)
-                const nombreVideo = `video_subido_${Date.now()}.${file.name.split('.').pop()}`;
-                const rutaVideo = `${proyectoSeleccionado.carpeta}/${nombreVideo}`;
-                
-                // En un entorno real, aquí se subiría al servidor
-                // Por ahora, lo guardamos en memoria
-                archivosPorProyecto[proyectoSeleccionado.id].videos.push(rutaVideo);
-                
                 // Guardar referencia para reproducción
                 if (!window.videosTemp) window.videosTemp = {};
                 window.videosTemp[rutaVideo] = videoURL;
+                
+                // Agregar a la lista
+                archivosPorProyecto[proyectoSeleccionado.id].videos.push(rutaVideo);
                 
                 // Recargar la galería
                 cargarArchivosProyecto(proyectoSeleccionado.id);
@@ -911,7 +938,10 @@
             source.src = src;
         }
         
-        title.textContent = `🎬 ${nombre}`;
+        // Obtener el nombre del archivo sin la ruta
+        const nombreArchivo = nombre.split('/').pop();
+        title.textContent = `🎬 ${nombreArchivo}`;
+        
         video.load();
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -939,7 +969,7 @@
         document.body.style.overflow = 'auto';
     }
     
-    // Cerrar modal de video con ESC
+    // Cerrar modales con ESC
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             cerrarModal();
