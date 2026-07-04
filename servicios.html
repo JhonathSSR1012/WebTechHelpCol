@@ -556,9 +556,7 @@
                 "StarMarket_System/S13.png"
             ],
             videos: [
-                // Agrega aquí los videos de StarMarket_System
-                // "StarMarket_System/video_demo.mp4",
-                // "StarMarket_System/tutorial.webm"
+                // "StarMarket_System/video_demo.mp4"
             ]
         },
         2: {
@@ -573,7 +571,6 @@
                 "LectorFactXML/L8.png"
             ],
             videos: [
-                // Agrega aquí los videos de LectorFactXML
                 // "LectorFactXML/video_demo.mp4"
             ]
         },
@@ -586,7 +583,6 @@
                 "QRVentas/imgQr5.png"
             ],
             videos: [
-                // Agrega aquí los videos de QRVentas
                 // "QRVentas/video_demo.mp4"
             ]
         },
@@ -604,7 +600,6 @@
                 "SchoolNote/Sabana.png"
             ],
             videos: [
-                
                 "SchoolNote/Schoolnote.mp4"
             ]
         }
@@ -669,17 +664,17 @@
         
         gallery.innerHTML = '';
         
-        // Crear lista combinada de todos los archivos (imágenes y videos)
+        // Crear lista combinada: PRIMERO VIDEOS, LUEGO IMÁGENES
         let todosLosArchivos = [];
         
-        // Agregar imágenes
-        archivos.imagenes.forEach(ruta => {
-            todosLosArchivos.push({ tipo: 'imagen', ruta: ruta, extension: ruta.split('.').pop() });
-        });
-        
-        // Agregar videos (están en la misma carpeta)
+        // PRIMERO agregar videos
         archivos.videos.forEach(ruta => {
             todosLosArchivos.push({ tipo: 'video', ruta: ruta, extension: ruta.split('.').pop() });
+        });
+        
+        // LUEGO agregar imágenes
+        archivos.imagenes.forEach(ruta => {
+            todosLosArchivos.push({ tipo: 'imagen', ruta: ruta, extension: ruta.split('.').pop() });
         });
         
         if (todosLosArchivos.length === 0) {
@@ -698,42 +693,7 @@
             div.className = 'gallery-item';
             div.dataset.index = index;
             
-            if (archivo.tipo === 'imagen') {
-                // Crear elemento de imagen
-                const img = document.createElement('img');
-                img.src = RUTA_BASE + archivo.ruta;
-                img.className = 'gallery-img';
-                img.alt = `Imagen del proyecto ${proyectoSeleccionado?.nombre || ''}`;
-                img.loading = 'lazy';
-                
-                img.onerror = function() {
-                    this.style.display = 'none';
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'gallery-img-error';
-                    errorDiv.innerHTML = `
-                        <div>
-                            <i class="fas fa-image" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
-                            <span>Error al cargar</span>
-                            <span style="display: block; font-size: 11px; color: #999; margin-top: 4px;">${archivo.ruta}</span>
-                        </div>
-                    `;
-                    this.parentNode.appendChild(errorDiv);
-                    archivosCargados++;
-                    verificarCargaCompleta();
-                };
-                
-                img.onload = function() {
-                    archivosCargados++;
-                    verificarCargaCompleta();
-                };
-                
-                img.onclick = function(e) {
-                    e.stopPropagation();
-                    abrirModal(this.src);
-                };
-                
-                div.appendChild(img);
-            } else if (archivo.tipo === 'video') {
+            if (archivo.tipo === 'video') {
                 // Crear elemento de video
                 const wrapper = document.createElement('div');
                 wrapper.className = 'gallery-video-wrapper';
@@ -746,7 +706,6 @@
                 
                 // Intentar mostrar miniatura
                 video.onloadedmetadata = function() {
-                    // Intentar obtener un frame para miniatura
                     this.currentTime = Math.min(1, this.duration / 2);
                 };
                 
@@ -802,6 +761,41 @@
                         reproducirVideo(videoElement.src, archivo.ruta);
                     }
                 };
+            } else if (archivo.tipo === 'imagen') {
+                // Crear elemento de imagen
+                const img = document.createElement('img');
+                img.src = RUTA_BASE + archivo.ruta;
+                img.className = 'gallery-img';
+                img.alt = `Imagen del proyecto ${proyectoSeleccionado?.nombre || ''}`;
+                img.loading = 'lazy';
+                
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'gallery-img-error';
+                    errorDiv.innerHTML = `
+                        <div>
+                            <i class="fas fa-image" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
+                            <span>Error al cargar</span>
+                            <span style="display: block; font-size: 11px; color: #999; margin-top: 4px;">${archivo.ruta}</span>
+                        </div>
+                    `;
+                    this.parentNode.appendChild(errorDiv);
+                    archivosCargados++;
+                    verificarCargaCompleta();
+                };
+                
+                img.onload = function() {
+                    archivosCargados++;
+                    verificarCargaCompleta();
+                };
+                
+                img.onclick = function(e) {
+                    e.stopPropagation();
+                    abrirModal(this.src);
+                };
+                
+                div.appendChild(img);
             }
             
             gallery.appendChild(div);
