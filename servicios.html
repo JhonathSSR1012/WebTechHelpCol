@@ -413,36 +413,6 @@
             cursor: pointer;
         }
         
-        /* Botón para subir video */
-        .btn-subir-video {
-            background: #9C27B0;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin: 10px 0;
-        }
-        
-        .btn-subir-video:hover {
-            background: #7B1FA2;
-            transform: scale(1.05);
-        }
-        
-        .upload-section {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin: 10px 0;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 12px;
-        }
-        
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 20px; }
@@ -472,16 +442,6 @@
     <div class="proyecto-gallery" id="galeriaProyecto">
         <div class="gallery-title">
             <i class="fas fa-folder-open"></i> Imágenes y Videos del Proyecto Seleccionado
-        </div>
-        
-        <!-- Sección para subir video -->
-        <div class="upload-section">
-            <button class="btn-subir-video" onclick="subirVideo()">
-                <i class="fas fa-video"></i> Subir Video
-            </button>
-            <span style="font-size: 12px; color: #666;">
-                <i class="fas fa-info-circle"></i> Formatos soportados: MP4, WebM, OGG, AVI, MOV
-            </span>
         </div>
         
         <div class="gallery-wrapper">
@@ -644,8 +604,8 @@
                 "SchoolNote/Sabana.png"
             ],
             videos: [
-                
-                "SchoolNote/Schoolnote.mp4"
+                // Agrega aquí los videos de SchoolNote
+                // "SchoolNote/video_demo.mp4"
             ]
         }
     };
@@ -863,67 +823,6 @@
         }, 3000);
     }
     
-    // ========== FUNCIONES PARA SUBIR VIDEO ==========
-    function subirVideo() {
-        if (!proyectoSeleccionado) {
-            alert("⚠️ Por favor, selecciona un proyecto primero");
-            return;
-        }
-        
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'video/*';
-        input.multiple = false;
-        
-        input.onchange = function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                // Validar tipo de archivo
-                const tiposPermitidos = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'];
-                if (!tiposPermitidos.includes(file.type)) {
-                    alert('⚠️ Formato de video no soportado. Usa: MP4, WebM, OGG, MOV o AVI');
-                    return;
-                }
-                
-                // Validar tamaño (máximo 100MB)
-                if (file.size > 100 * 1024 * 1024) {
-                    alert('⚠️ El video es demasiado grande (máximo 100MB)');
-                    return;
-                }
-                
-                // Crear URL para el video
-                const videoURL = URL.createObjectURL(file);
-                
-                // Obtener el nombre del archivo
-                const nombreVideo = file.name;
-                const rutaVideo = `${proyectoSeleccionado.carpeta}/${nombreVideo}`;
-                
-                // Agregar a la lista de archivos del proyecto
-                if (!archivosPorProyecto[proyectoSeleccionado.id]) {
-                    archivosPorProyecto[proyectoSeleccionado.id] = { imagenes: [], videos: [] };
-                }
-                
-                if (!archivosPorProyecto[proyectoSeleccionado.id].videos) {
-                    archivosPorProyecto[proyectoSeleccionado.id].videos = [];
-                }
-                
-                // Guardar referencia para reproducción
-                if (!window.videosTemp) window.videosTemp = {};
-                window.videosTemp[rutaVideo] = videoURL;
-                
-                // Agregar a la lista
-                archivosPorProyecto[proyectoSeleccionado.id].videos.push(rutaVideo);
-                
-                // Recargar la galería
-                cargarArchivosProyecto(proyectoSeleccionado.id);
-                
-                alert(`✅ Video "${file.name}" subido correctamente`);
-            }
-        };
-        
-        input.click();
-    }
-    
     // ========== FUNCIONES PARA EL MODAL DE VIDEO ==========
     function reproducirVideo(src, nombre) {
         const modal = document.getElementById('modalVideo');
@@ -931,12 +830,7 @@
         const source = document.getElementById('videoSource');
         const title = document.getElementById('videoTitle');
         
-        // Usar la URL temporal si existe
-        if (window.videosTemp && window.videosTemp[nombre]) {
-            source.src = window.videosTemp[nombre];
-        } else {
-            source.src = src;
-        }
+        source.src = src;
         
         // Obtener el nombre del archivo sin la ruta
         const nombreArchivo = nombre.split('/').pop();
@@ -980,7 +874,6 @@
     window.abrirModal = abrirModal;
     window.cerrarModal = cerrarModal;
     window.cerrarModalVideo = cerrarModalVideo;
-    window.subirVideo = subirVideo;
     
     function mostrarAlerta(elementId, mensaje, tipo) {
         const alert = document.getElementById(elementId);
