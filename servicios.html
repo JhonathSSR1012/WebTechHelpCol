@@ -894,48 +894,10 @@
         });
     }
     
-    function generarRecibo(metodoPago, referencia) {
-        if (!proyectoSeleccionado) return null;
-        
-        return {
-            numero: `R-${Date.now()}-${Math.floor(Math.random()*10000)}`,
-            fecha: new Date().toLocaleString('es-CO'),
-            proyecto: proyectoSeleccionado.nombre,
-            descripcion: proyectoSeleccionado.descripcion,
-            licenciamiento: proyectoSeleccionado.licenciamiento,
-            monto: proyectoSeleccionado.precio,
-            metodo: metodoPago,
-            referencia: referencia,
-            cliente: "Cliente Web - InnovaTI"
-        };
-    }
-    
-    function mostrarRecibo(recibo) {
-        const container = document.getElementById('reciboContent');
-        container.innerHTML = `
-            <p><strong>🧾 N° Recibo:</strong> ${recibo.numero}</p>
-            <p><strong>📅 Fecha:</strong> ${recibo.fecha}</p>
-            <p><strong>🏗️ Proyecto:</strong> ${recibo.proyecto}</p>
-            <p><strong>📝 Descripción:</strong> ${recibo.descripcion}</p>
-            <p><strong>⏱️ Licenciamiento:</strong> ${recibo.licenciamiento}</p>
-            <p><strong>💰 Monto:</strong> $${recibo.monto.toLocaleString('es-CO')} COP</p>
-            <p><strong>💳 Método de pago:</strong> ${recibo.metodo}</p>
-            <p><strong>🔑 Referencia:</strong> ${recibo.referencia}</p>
-            <hr>
-            <p><i class="fas fa-check-circle" style="color:#2ecc71; font-size:20px;"></i> <strong>¡Pago registrado exitosamente!</strong></p>
-            <p style="margin-top:15px; font-size:12px; color:#666;">📧 Soporte: techhelp2026s@gmail.com | 📱 Celular: 3046101679</p>
-            <p style="font-size:11px; color:#999;">InnovaTI - Soluciones Tecnológicas Integrales</p>
-        `;
-        document.getElementById('recibo').classList.add('visible');
-        
-        const historial = JSON.parse(localStorage.getItem('historialCompras') || '[]');
-        historial.unshift(recibo);
-        localStorage.setItem('historialCompras', JSON.stringify(historial.slice(0, 20)));
-    }
     
     
-    document.getElementById('pagarNequi').onclick = () => procesarPago('NEQUI');
-    document.getElementById('pagarDavivienda').onclick = () => procesarPago('DAVIVIENDA');
+    
+    
     
     document.getElementById('imprimirRecibo').onclick = () => {
         const contenido = document.getElementById('reciboContent').innerHTML;
@@ -984,10 +946,16 @@
     
     renderizarProyectos();
     if (proyectos.length > 0) {
-        proyectoSeleccionado = proyectos[0];
-        renderizarProyectos();
-        cargarArchivosProyecto(proyectoSeleccionado.id);
-    }
+    proyectoSeleccionado = proyectos[0];
+
+    renderizarProyectos();
+    cargarArchivosProyecto(proyectoSeleccionado.id);
+
+    const gallery = document.getElementById('galleryContainer');
+    gallery.scrollLeft = 0;
+
+    updateNavButtons();
+}
 </script>
 </body>
 </html>
