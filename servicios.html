@@ -419,7 +419,7 @@
 <body>
 <div class="container">
     <h1><i class="fas fa-cogs"></i> Módulo de Servicios</h1>
-    <div class="sub">Selecciona un proyecto y realiza el pago para envio del recibo al correo de contacto</div>
+    <div class="sub">Selecciona un proyecto y contacta por correo electónico</div>
 
     <div class="product-list" id="productList"></div>
 
@@ -440,13 +440,6 @@
         <div class="gallery-counter" id="galleryCounter">0 / 0 elementos</div>
     </div>
 
-    <div class="payment-buttons">
-        <button class="btn-pago btn-nequi" id="pagarNequi">
-            <i class="fas fa-mobile-alt"></i> Pagar con Nequi
-        </button>
-        <button class="btn-pago btn-davivienda" id="pagarDavivienda">
-            <i class="fas fa-university"></i> Pagar con Davivienda
-        </button>
     </div>
 
     <div id="recibo" class="recibo">
@@ -483,7 +476,9 @@
             nombre: "🏗️ StarMarket_System - APP Supermercado", 
             descripcion: "Implementación de inventarios de productos, gestión de proveedores, gestión de pagos, gestión de clientes, imprimir facturas",
             licenciamiento: "30 dias",
-            precio: 600000,
+            Cuota_Mensual: 80000,
+            contacto: "304 6101679, techhelp2026s@gmail.com",
+            precio: 600000, 
             carpeta: "StarMarket_System"
         },
         { 
@@ -491,6 +486,8 @@
             nombre: "🏭 LectorFactXML - Lector de facturación XML", 
             descripcion: "Lector de facturación DIAN, convertidor de XML, Descarga Masiva de Archivos con Token",
             licenciamiento: "180 dias",
+            Cuota_Mensual: 80000,
+            contacto: "304 6101679, techhelp2026s@gmail.com",
             precio: 800000,
             carpeta: "LectorFactXML"
         },
@@ -499,6 +496,8 @@
             nombre: "💳 QRVentas - Sistema QR de Ventas", 
             descripcion: "Implementación de un sistema QR de ventas para tiendas, abarrotes, supermercados",
             licenciamiento: "30 dias",
+            Cuota_Mensual: 80000,
+            contacto: "304 6101679, techhelp2026s@gmail.com",
             precio: 440000,
             carpeta: "QRVentas"
         },
@@ -507,6 +506,8 @@
             nombre: "🏫 SchoolNote - Sistema Base de datos Colegio", 
             descripcion: "Implementación de un sistema de Base de datos de Colegio, modulos de materias, profesores, estudiantes, sabana de notas",
             licenciamiento: "365 dias",
+            Cuota_Mensual: 100000,
+            contacto: "304 6101679, techhelp2026s@gmail.com",
             precio: 1450000,
             carpeta: "SchoolNote"
         }
@@ -932,49 +933,6 @@
         localStorage.setItem('historialCompras', JSON.stringify(historial.slice(0, 20)));
     }
     
-    async function procesarPago(metodo) {
-        if (!proyectoSeleccionado) {
-            alert("⚠️ Por favor, selecciona un proyecto primero");
-            return;
-        }
-        
-        if (pagoRealizado) {
-            alert("⚠️ Ya has realizado el pago para este proyecto. Puedes ver tu recibo arriba.");
-            return;
-        }
-        
-        const referencia = `PAGO-${proyectoSeleccionado.id}-${Date.now()}`;
-        const metodoNombre = metodo === 'NEQUI' ? 'Nequi' : 'Davivienda';
-        const monto = proyectoSeleccionado.precio;
-        const servicio = proyectoSeleccionado.nombre;
-        
-        const urlPago = `pagos.html?show=${metodo === 'NEQUI' ? 'nequi' : 'davivienda'}&monto=${monto}&servicio=${encodeURIComponent(servicio)}`;
-        
-        const ventanaPago = window.open(urlPago, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
-        
-        if (!ventanaPago) {
-            alert("⚠️ Por favor, permite ventanas emergentes para continuar con el pago.");
-            return;
-        }
-        
-        function recibirConfirmacion(event) {
-            if (event.data && event.data.type === 'PAGO_CONFIRMADO') {
-                window.removeEventListener('message', recibirConfirmacion);
-                pagoRealizado = true;
-                
-                mostrarAlerta('recibo', `✅ Pago confirmado!`, 'success');
-                
-                const recibo = generarRecibo(metodoNombre, event.data.referencia || referencia);
-                mostrarRecibo(recibo);
-                
-                if (ventanaPago && !ventanaPago.closed) {
-                    ventanaPago.close();
-                }
-            }
-        }
-        
-        window.addEventListener('message', recibirConfirmacion);
-    }
     
     document.getElementById('pagarNequi').onclick = () => procesarPago('NEQUI');
     document.getElementById('pagarDavivienda').onclick = () => procesarPago('DAVIVIENDA');
